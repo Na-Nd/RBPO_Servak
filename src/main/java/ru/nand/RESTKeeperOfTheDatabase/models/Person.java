@@ -30,6 +30,10 @@ public class Person {
     @NotEmpty(message = "Email should be not emty")
     private String email;
 
+    @Column(name = "password")
+    @NotEmpty(message = "Password should not be empty")
+    private String password;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -42,10 +46,11 @@ public class Person {
     public Person() {
     }
 
-    public Person(String name, int age, String email) {
+    public Person(String name, int age, String email, String password) {
         this.name = name;
         this.age = age;
         this.email = email;
+        this.password = password;
     }
 
     public int getId() {
@@ -102,5 +107,13 @@ public class Person {
 
     public void setCreatedWho(String createdWho) {
         this.createdWho = createdWho;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

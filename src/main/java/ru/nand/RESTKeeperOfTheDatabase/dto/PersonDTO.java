@@ -6,18 +6,19 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 public class PersonDTO {
-
-    @NotEmpty(message = "Name should be empty!")
+    @NotEmpty(message = "Name should not be empty!")
     @Size(min = 2, max = 30, message = "Name should be from 2 to 30 characters")
     private String name;
 
-
-    @Min(value = 0, message = "Age should be greater then 0")
+    @Min(value = 0, message = "Age should be greater than 0")
     private int age;
 
     @Email
     @NotEmpty(message = "Email should not be empty")
     private String email;
+
+    @NotEmpty(message = "Password should not be empty")
+    private String password;
 
     public String getName() {
         return name;
@@ -41,5 +42,13 @@ public class PersonDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

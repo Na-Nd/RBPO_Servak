@@ -6,5 +6,6 @@ import ru.nand.RESTKeeperOfTheDatabase.models.Person;
 
 @Repository
 public interface PersonRepository extends JpaRepository<Person, Integer> {
+    Person findByEmail(String email);
 
 }
