@@ -59,6 +59,7 @@ public class PersonControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(personController).build();
     }
 
+    // Сценарий успешной регистрации
     @Test
     public void testRegister() throws Exception{
         PersonDTO personDTO = new PersonDTO();
@@ -67,7 +68,8 @@ public class PersonControllerTest {
         personDTO.setEmail("ivan@mail.com");
         personDTO.setPassword("encodedPassword");
 
-        Person person = new Person("ivan", 19, "ivan@mail.com", "encodedPassword");
+
+        Person person = modelMapper.map(personDTO, Person.class);
 
         when(passwordEncoder.encode(any(String.class))).thenReturn("encodedPassword");
         when(modelMapper.map(any(PersonDTO.class), any(Class.class))).thenReturn("person");
