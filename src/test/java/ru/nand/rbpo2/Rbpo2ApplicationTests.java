@@ -1,10 +1,10 @@
-package ru.nand.RESTKeeperOfTheDatabase;
+package ru.nand.rbpo2;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RestKeeperOfTheDatabaseApplicationTests {
+class Rbpo2ApplicationTests {
 
 	@Test
 	void contextLoads() {
