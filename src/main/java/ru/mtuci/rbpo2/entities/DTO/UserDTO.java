@@ -1,7 +1,7 @@
-package ru.nand.rbpo2.entities.DTO;
+package ru.mtuci.rbpo2.entities.DTO;
 
-import ru.nand.rbpo2.entities.License;
-import ru.nand.rbpo2.entities.enums.ROLE;
+import ru.mtuci.rbpo2.entities.License;
+import ru.mtuci.rbpo2.entities.enums.ROLE;
 
 import java.util.List;
 

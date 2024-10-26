@@ -1,10 +1,9 @@
-package ru.nand.rbpo2.seriveces;
+package ru.mtuci.rbpo2.seriveces;
 
-import com.fasterxml.jackson.annotation.OptBoolean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.nand.rbpo2.entities.License;
-import ru.nand.rbpo2.repositories.LicenseRepository;
+import ru.mtuci.rbpo2.repositories.LicenseRepository;
+import ru.mtuci.rbpo2.entities.License;
 
 import java.util.Optional;
 

@@ -1,8 +1,8 @@
-package ru.nand.rbpo2.entities;
+package ru.mtuci.rbpo2.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import ru.nand.rbpo2.entities.enums.ROLE;
+import ru.mtuci.rbpo2.entities.enums.ROLE;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package ru.nand.rbpo2;
+package ru.mtuci.rbpo2;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

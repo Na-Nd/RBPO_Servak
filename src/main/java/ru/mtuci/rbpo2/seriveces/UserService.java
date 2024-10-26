@@ -1,11 +1,11 @@
-package ru.nand.rbpo2.seriveces;
+package ru.mtuci.rbpo2.seriveces;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.nand.rbpo2.entities.License;
-import ru.nand.rbpo2.entities.User;
-import ru.nand.rbpo2.repositories.LicenseRepository;
-import ru.nand.rbpo2.repositories.UserRepository;
+import ru.mtuci.rbpo2.repositories.LicenseRepository;
+import ru.mtuci.rbpo2.repositories.UserRepository;
+import ru.mtuci.rbpo2.entities.License;
+import ru.mtuci.rbpo2.entities.User;
 
 import java.util.List;
 import java.util.Optional;

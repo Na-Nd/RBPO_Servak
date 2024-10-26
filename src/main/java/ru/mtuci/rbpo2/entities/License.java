@@ -1,4 +1,4 @@
-package ru.nand.rbpo2.entities;
+package ru.mtuci.rbpo2.entities;
 
 import jakarta.persistence.*;
 

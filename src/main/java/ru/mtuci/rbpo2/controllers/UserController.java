@@ -1,14 +1,14 @@
-package ru.nand.rbpo2.controllers;
+package ru.mtuci.rbpo2.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.nand.rbpo2.entities.DTO.UserDTO;
-import ru.nand.rbpo2.entities.License;
-import ru.nand.rbpo2.entities.User;
-import ru.nand.rbpo2.entities.enums.ROLE;
-import ru.nand.rbpo2.seriveces.LicenseService;
-import ru.nand.rbpo2.seriveces.UserService;
+import ru.mtuci.rbpo2.entities.DTO.UserDTO;
+import ru.mtuci.rbpo2.entities.License;
+import ru.mtuci.rbpo2.entities.User;
+import ru.mtuci.rbpo2.entities.enums.ROLE;
+import ru.mtuci.rbpo2.seriveces.LicenseService;
+import ru.mtuci.rbpo2.seriveces.UserService;
 
 import java.util.List;
 import java.util.Optional;

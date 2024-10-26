@@ -1,10 +1,10 @@
-package ru.nand.rbpo2.controllers;
+package ru.mtuci.rbpo2.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.nand.rbpo2.entities.License;
-import ru.nand.rbpo2.seriveces.LicenseService;
+import ru.mtuci.rbpo2.entities.License;
+import ru.mtuci.rbpo2.seriveces.LicenseService;
 
 @RestController
 @RequestMapping("/licenses")
