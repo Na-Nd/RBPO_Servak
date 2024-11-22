@@ -1,9 +1,14 @@
 package ru.mtuci.servak.entities.Task5;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
+@Setter
+@Getter
 @Entity
 public class License {
     @Id
@@ -17,11 +22,11 @@ public class License {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "type_id")
+    @JoinColumn(name = "type_id", nullable = false)
     private LicenseType type;
 
     @Temporal(TemporalType.DATE)
@@ -35,5 +40,8 @@ public class License {
     private Long ownerId;
     private Integer duration;
     private String description;
+
+    @OneToMany(mappedBy = "license", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DeviceLicense> deviceLicenses;
 
 }

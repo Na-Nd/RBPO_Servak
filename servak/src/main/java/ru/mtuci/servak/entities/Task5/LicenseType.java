@@ -1,9 +1,13 @@
 package ru.mtuci.servak.entities.Task5;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Setter
+@Getter
 @Entity
 public class LicenseType {
     @Id
@@ -14,7 +18,7 @@ public class LicenseType {
     private Integer defaultDuration;
     private String description;
 
-    @OneToMany(mappedBy = "type")
+    @OneToMany(mappedBy = "type", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<License> licenses;
 
 }
