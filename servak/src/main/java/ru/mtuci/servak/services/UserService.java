@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import ru.mtuci.servak.entities.User;
 import ru.mtuci.servak.repositories.UserRepository;
 
+import java.util.Optional;
+
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
@@ -27,5 +29,13 @@ public class UserService implements UserDetailsService {
 
     public User findByLogin(String login){
         return userRepository.findByLogin(login);
+    }
+
+    public User getUserById(Long id){
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            throw new RuntimeException("Пользователь с id: " + id + " не найден");
+        }
+        return user;
     }
 }

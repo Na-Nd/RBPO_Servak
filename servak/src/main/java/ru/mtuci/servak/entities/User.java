@@ -1,5 +1,7 @@
 package ru.mtuci.servak.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "users")
+@JsonIgnoreProperties({"licenses", "devices"}) // Игнорируем связи при сериализации, чтобы не было рекурсии в ответе
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,15 +33,19 @@ public class User implements UserDetails {
 
     private String email;
 
+    @Enumerated(EnumType.STRING)
     private ROLE role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference  // Аннотация для управления сериализацией, предотвращая рекурсию
     private List<Device> devices;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference  // Аннотация для управления сериализацией, предотвращая рекурсию
     private List<License> licenses;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference  // Аннотация для управления сериализацией, предотвращая рекурсию
     private List<LicenseHistory> licenseHistories;
 
     public User(String login, String passwordHash, String email, ROLE role, List<Device> devices, List<License> licenses, List<LicenseHistory> licenseHistories) {

@@ -15,6 +15,10 @@ public class LicenseHistory {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "license_id", nullable = false) // Внешний ключ указывает на лицензию
+    private License license;
+
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false) // Внешний ключ указывает на пользователя
     private User user;
 
@@ -24,5 +28,4 @@ public class LicenseHistory {
     private Date changeDate;
 
     private String description;
-
 }

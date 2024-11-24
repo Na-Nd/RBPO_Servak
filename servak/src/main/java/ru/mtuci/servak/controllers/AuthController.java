@@ -35,7 +35,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Ошибка валидации: " + bindingResult.getAllErrors());
         }
 
-        User user = new User(userDTO.getLogin(), passwordEncoder.encode(userDTO.getPassword()), userDTO.getEmail(), ROLE.USER,null, null, null);
+        User user = new User(userDTO.getLogin(), passwordEncoder.encode(userDTO.getPassword()), userDTO.getEmail(), ROLE.ROLE_USER,null, null, null);
 
         userService.save(user);
 
