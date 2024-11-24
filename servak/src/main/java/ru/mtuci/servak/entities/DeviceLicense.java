@@ -1,4 +1,4 @@
-package ru.mtuci.servak.entities.Task5;
+package ru.mtuci.servak.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,17 +12,16 @@ import java.util.Date;
 public class DeviceLicense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long licenseId;
+    private Long id;  // Переименовано с licenseId на id
 
     @ManyToOne
     @JoinColumn(name = "device_id", nullable = false)
     private Device device;
 
     @ManyToOne
-    @JoinColumn(name = "license_id", nullable = false) // Внешний ключ указывает на License
+    @JoinColumn(name = "license_id", nullable = false) // Внешний ключ, указывающий на License
     private License license;
 
     @Temporal(TemporalType.DATE)
     private Date activationDate;
-
 }

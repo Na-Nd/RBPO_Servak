@@ -7,7 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.mtuci.servak.entities.DTO.UserDTO;
+import ru.mtuci.servak.entities.DTO.UserLoginDTO;
+import ru.mtuci.servak.entities.DTO.UserRegisterDTO;
 import ru.mtuci.servak.entities.ENUMS.ROLE;
 import ru.mtuci.servak.entities.User;
 import ru.mtuci.servak.services.UserService;
@@ -29,12 +30,12 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> userRegister(@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult){
+    public ResponseEntity<?> userRegister(@Valid @RequestBody UserRegisterDTO userDTO, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             return ResponseEntity.badRequest().body("Ошибка валидации: " + bindingResult.getAllErrors());
         }
 
-        User user = new User(userDTO.getLogin(), passwordEncoder.encode(userDTO.getPassword()), ROLE.USER, null);
+        User user = new User(userDTO.getLogin(), passwordEncoder.encode(userDTO.getPassword()), userDTO.getEmail(), ROLE.USER,null, null, null);
 
         userService.save(user);
 
@@ -47,7 +48,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> userLogin(@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult){
+    public ResponseEntity<?> userLogin(@Valid @RequestBody UserLoginDTO userDTO, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             return ResponseEntity.badRequest().body("Ошибка валидации: " + bindingResult.getAllErrors());
         }
