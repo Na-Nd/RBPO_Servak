@@ -6,6 +6,7 @@ import ru.mtuci.servak.entities.*;
 import ru.mtuci.servak.repositories.LicenseRepository;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -72,16 +73,15 @@ public class LicenseService {
     }
 
     public Ticket activateLicense(String activationCode, Device device, String username) {
-        // Поиск лицензии
         License license = findLicenseByCode(activationCode);
         if (license == null) {
             throw new IllegalArgumentException("Лицензия не найдена");
         }
 
-        // Валидация активации
+        // Валидация
         validateActivation(license, device, username);
 
-        // Создание привязки устройства
+        // Привязка
         createDeviceLicense(license, device);
 
         // Обновление лицензии
@@ -89,7 +89,7 @@ public class LicenseService {
 
         User currentUser = userService.findByLogin(username);
 
-        // Запись в историю изменений
+        // Запись в историю
         licenseHistoryService.recordLicenseChange(license, currentUser, "Activated", "Лицензия активирована");
 
         // Генерация тикета
@@ -116,6 +116,7 @@ public class LicenseService {
         DeviceLicense deviceLicense = new DeviceLicense();
         deviceLicense.setDevice(device);
         deviceLicense.setLicense(license);
+        deviceLicense.setActivationDate(new Date());
 
         deviceLicenseService.save(deviceLicense);
     }
@@ -139,6 +140,14 @@ public class LicenseService {
     }
 
     private String generateSignature(Ticket ticket) {
-        return "bks2202_signature";
+        return "bks2202_signature"; // TODO Не понял что за подпись должна быть
+    }
+
+    // Получение незаблокированных лицензий
+    public List<License> getActiveLicensesForDevice(Device device, User user){
+        return device.getDeviceLicenses().stream()
+                .map(DeviceLicense::getLicense)
+                .filter(license -> !license.getBlocked())
+                .toList();
     }
 }
