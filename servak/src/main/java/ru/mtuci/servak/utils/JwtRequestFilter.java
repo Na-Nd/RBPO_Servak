@@ -35,10 +35,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             if (token != null && jwtUtil.validateToken(token)) {
                 // Если токен валиден
                 String username = jwtUtil.extractLogin(token);
-
+                System.out.println("Токен валиден, пользователь: " + username);
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userService.loadUserByUsername(username);
-
+                    System.out.println("В UserDetails лежит: " + userDetails.getUsername());
                     SecurityContextHolder.getContext().setAuthentication(jwtUtil.getAuthentication(token, userDetails));
                 }
             }

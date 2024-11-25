@@ -18,7 +18,7 @@ public class LicenseController {
         this.licenseService = licenseService;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<?> createLicense(@RequestBody LicenseRequest licenseRequest) {
         System.out.println("Попал в createLicense");

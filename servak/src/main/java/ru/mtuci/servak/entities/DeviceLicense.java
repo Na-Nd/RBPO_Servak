@@ -1,5 +1,6 @@
 package ru.mtuci.servak.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,7 @@ public class DeviceLicense {
 
     @ManyToOne
     @JoinColumn(name = "device_id", nullable = false)
+    @JsonBackReference
     private Device device;
 
     @ManyToOne

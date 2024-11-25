@@ -2,9 +2,8 @@ package ru.mtuci.servak.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.mtuci.servak.entities.License;
+import ru.mtuci.servak.entities.DeviceLicense;
 
 @Repository
-public interface LicenseRepository extends JpaRepository<License, Long> {
-    public License findByCode(String code);
+public interface DeviceLicenseRepository extends JpaRepository<DeviceLicense, Long> {
 }

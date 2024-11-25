@@ -15,14 +15,16 @@ public class LicenseService {
     private final UserService userService;
     private final LicenseTypeService licenseTypeService;
     private final LicenseHistoryService licenseHistoryService;
+    private final DeviceLicenseService deviceLicenseService;
 
     @Autowired
-    public LicenseService(LicenseRepository licenseRepository, ProductService productService, UserService userService, LicenseTypeService licenseTypeService, LicenseHistoryService licenseHistoryService) {
+    public LicenseService(LicenseRepository licenseRepository, ProductService productService, UserService userService, LicenseTypeService licenseTypeService, LicenseHistoryService licenseHistoryService, DeviceLicenseService deviceLicenseService) {
         this.licenseRepository = licenseRepository;
         this.productService = productService;
         this.userService = userService;
         this.licenseTypeService = licenseTypeService;
         this.licenseHistoryService = licenseHistoryService;
+        this.deviceLicenseService = deviceLicenseService;
     }
 
     public License createLicense(
@@ -67,5 +69,76 @@ public class LicenseService {
         licenseHistoryService.recordLicenseChange(license, owner, "Создана", description);
 
         return license;
+    }
+
+    public Ticket activateLicense(String activationCode, Device device, String username) {
+        // Поиск лицензии
+        License license = findLicenseByCode(activationCode);
+        if (license == null) {
+            throw new IllegalArgumentException("Лицензия не найдена");
+        }
+
+        // Валидация активации
+        validateActivation(license, device, username);
+
+        // Создание привязки устройства
+        createDeviceLicense(license, device);
+
+        // Обновление лицензии
+        updateLicense(license);
+
+        User currentUser = userService.findByLogin(username);
+
+        // Запись в историю изменений
+        licenseHistoryService.recordLicenseChange(license, currentUser, "Activated", "Лицензия активирована");
+
+        // Генерация тикета
+        return generateTicket(license, device);
+    }
+
+    private License findLicenseByCode(String code) {
+        return licenseRepository.findByCode(code);
+    }
+
+    private void validateActivation(License license, Device device, String username) {
+        if (license.getBlocked()) {
+            throw new IllegalArgumentException("Активация невозможна: лицензия заблокирована");
+        }
+
+        if (license.getEndingDate().before(new Date())) {
+            throw new IllegalArgumentException("Активация невозможна: лицензия истекла");
+        }
+
+        // TODO Дополнительные проверки
+    }
+
+    private void createDeviceLicense(License license, Device device) {
+        DeviceLicense deviceLicense = new DeviceLicense();
+        deviceLicense.setDevice(device);
+        deviceLicense.setLicense(license);
+
+        deviceLicenseService.save(deviceLicense);
+    }
+
+    private void updateLicense(License license) {
+        licenseRepository.save(license);
+    }
+
+    private Ticket generateTicket(License license, Device device) {
+        Ticket ticket = new Ticket();
+        ticket.setCurrentDate(new Date());
+        ticket.setLivingTime(license.getDuration());
+        ticket.setActivationDate(new Date());
+        ticket.setExpirationDate(license.getEndingDate());
+        ticket.setUserId(license.getUser().getId().intValue());
+        ticket.setDeviceId(device.getId().intValue());
+        ticket.setBlocked(false);
+        ticket.setSignature(generateSignature(ticket));
+
+        return ticket;
+    }
+
+    private String generateSignature(Ticket ticket) {
+        return "bks2202_signature";
     }
 }

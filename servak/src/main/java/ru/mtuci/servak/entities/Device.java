@@ -1,5 +1,7 @@
 package ru.mtuci.servak.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,9 +22,11 @@ public class Device {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
 
     @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // Указываем, что эта связь должна сериализоваться
     private List<DeviceLicense> deviceLicenses;
 
 }
