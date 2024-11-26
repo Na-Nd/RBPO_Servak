@@ -17,15 +17,17 @@ public class LicenseService {
     private final LicenseTypeService licenseTypeService;
     private final LicenseHistoryService licenseHistoryService;
     private final DeviceLicenseService deviceLicenseService;
+    private final DeviceService deviceService;
 
     @Autowired
-    public LicenseService(LicenseRepository licenseRepository, ProductService productService, UserService userService, LicenseTypeService licenseTypeService, LicenseHistoryService licenseHistoryService, DeviceLicenseService deviceLicenseService) {
+    public LicenseService(LicenseRepository licenseRepository, ProductService productService, UserService userService, LicenseTypeService licenseTypeService, LicenseHistoryService licenseHistoryService, DeviceLicenseService deviceLicenseService, DeviceService deviceService) {
         this.licenseRepository = licenseRepository;
         this.productService = productService;
         this.userService = userService;
         this.licenseTypeService = licenseTypeService;
         this.licenseHistoryService = licenseHistoryService;
         this.deviceLicenseService = deviceLicenseService;
+        this.deviceService = deviceService;
     }
 
     public License createLicense(
@@ -150,4 +152,42 @@ public class LicenseService {
                 .filter(license -> !license.getBlocked())
                 .toList();
     }
+
+    public Ticket renewLicense(String licenseKey, String username){
+        License license = licenseRepository.findByCode(licenseKey);
+        if (license == null) {
+            return createFailureTicket("Недействительный ключ лицензии");
+        }
+
+        if(license.getBlocked()){
+            return createFailureTicket("Лицензия истекла");
+        }
+
+        license.setEndingDate(new Date(license.getEndingDate().getTime() + 365L * 24 * 60 * 60 * 1000));
+        licenseRepository.save(license);
+
+        return createSuccessTicket(license);
+    }
+
+    private Ticket createSuccessTicket(License license) {
+        Ticket ticket = new Ticket();
+        ticket.setCurrentDate(new Date());
+        ticket.setLivingTime(license.getDuration());
+        ticket.setActivationDate(new Date());
+        ticket.setExpirationDate(license.getEndingDate());
+        ticket.setUserId(license.getUser().getId().intValue());
+        ticket.setBlocked(false);
+        ticket.setSignature("bks2202_signature");
+        return ticket;
+    }
+
+    private Ticket createFailureTicket(String message) {
+        Ticket ticket = new Ticket();
+        ticket.setCurrentDate(new Date());
+        ticket.setBlocked(true);
+        ticket.setSignature(message);
+        return ticket;
+    }
+
+
 }
