@@ -57,7 +57,7 @@ public class User implements UserDetails {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@JsonManagedReference
+    @JsonManagedReference
     private List<LicenseHistory> licenseHistories;
 
     public User(Long id, String login, String passwordHash, String email, ROLE role, List<License> licenses) {

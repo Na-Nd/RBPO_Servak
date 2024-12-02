@@ -43,7 +43,6 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Validation error: " + bindingResult.getAllErrors());
         }
 
-        // Check if user with this login already exists
         if(userService.findUserByLogin(userDTO.getLogin()) != null){
             return ResponseEntity.badRequest().body("User with this login already exists");
         }
@@ -65,12 +64,10 @@ public class AuthController {
 
         User user = userService.findUserByLogin(userDTO.getLogin());
 
-        // If login not exist
         if(user == null){
             return ResponseEntity.badRequest().body("User not found");
         }
 
-        // If password didnt match
         if(!passwordEncoder.matches(userDTO.getPassword(), user.getPassword())){
             return ResponseEntity.status(401).build();
         }

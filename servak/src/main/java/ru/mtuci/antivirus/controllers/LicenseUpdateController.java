@@ -16,7 +16,6 @@ import ru.mtuci.antivirus.services.LicenseService;
 
 //TODO: 1. Убрать лишние проверки ✅
 
-@PreAuthorize("hasRole('ROLE_ADMIN')")
 @RestController
 @RequestMapping("/license")
 public class LicenseUpdateController {

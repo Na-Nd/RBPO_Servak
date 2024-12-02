@@ -19,7 +19,6 @@ import ru.mtuci.antivirus.services.UserService;
 //TODO: 1. Убрать лишние проверки (например стр. 42-43) ✅
 //TODO: 2. Поменять логику поиска текущей лицензии из списка (передать код вместе с мак адресом 39, 60) ✅
 
-@PreAuthorize("hasRole('ROLE_ADMIN')")
 @RestController
 @RequestMapping("/license")
 public class LicenseInfoController {

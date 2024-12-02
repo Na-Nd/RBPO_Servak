@@ -41,15 +41,23 @@ public class UserController {
     public ResponseEntity<String> updateUser(@RequestBody UserRequest user, @AuthenticationPrincipal UserDetails userDetails) {
         try {
             String findUsername = userDetails.getUsername();
-
             User currentUser = userService.findUserByLogin(findUsername);
 
-            if (user.getLogin() != null) {
+            if (user.getLogin() != null && !user.getLogin().equals(currentUser.getLogin())) {
+                if (userService.existsByLogin(user.getLogin())) {
+                    return ResponseEntity.status(400).body("Ошибка: Логин уже используется");
+                }
+
                 currentUser.setLogin(user.getLogin());
             }
-            if (user.getEmail() != null) {
+
+            if (user.getEmail() != null && !user.getEmail().equals(currentUser.getEmail())) {
+                if (userService.existsByEmail(user.getEmail())) {
+                    return ResponseEntity.status(400).body("Ошибка: Email уже используется");
+                }
                 currentUser.setEmail(user.getEmail());
             }
+
             if (user.getPasswordHash() != null) {
                 currentUser.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
             }
@@ -62,7 +70,6 @@ public class UserController {
             return ResponseEntity.status(500).body("Ошибка при обновлении пользователя");
         }
     }
-
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/delete/{id}")

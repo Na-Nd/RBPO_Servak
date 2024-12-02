@@ -1,6 +1,7 @@
 package ru.mtuci.antivirus.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -63,6 +64,7 @@ public class License {
     private List<DeviceLicense> deviceLicenses;
 
     @OneToMany(mappedBy = "license", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<LicenseHistory> licenseHistories;
 
     public License(Long id, String code, User user, Product product, LicenseType type, Date firstActivationDate, Date endingDate, Boolean isBlocked, int devicesCount, User owner, int duration, String description) {

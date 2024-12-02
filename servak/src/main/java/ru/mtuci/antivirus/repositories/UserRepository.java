@@ -8,4 +8,7 @@ import ru.mtuci.antivirus.entities.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findUserByLogin(String login);
     User getUserById(Long id);
+
+    boolean existsByLogin(String login);
+    boolean existsByEmail(String email);
 }

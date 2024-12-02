@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.mtuci.antivirus.entities.LicenseHistory;
 import ru.mtuci.antivirus.repositories.LicenseHistoryRepository;
 
+import java.util.List;
+
 @Service
 public class LicenseHistoryService {
 
@@ -19,4 +21,17 @@ public class LicenseHistoryService {
         licenseHistoryRepository.save(licenseHistory);
     }
 
+    public List<LicenseHistory> getAllLicenseHistories() {
+        return licenseHistoryRepository.findAll();
+    }
+
+    public LicenseHistory getLicenseHistoryById(Long id) {
+        return licenseHistoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Запись с id " + id + " не найдена"));
+    }
+
+    public void deleteLicenseHistoryById(Long id) {
+        LicenseHistory licenseHistory = getLicenseHistoryById(id);
+        licenseHistoryRepository.delete(licenseHistory);
+    }
 }

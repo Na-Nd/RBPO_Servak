@@ -42,4 +42,12 @@ public class UserService implements UserDetailsService {
     public void deleteUser(Long id){
         userRepository.deleteById(id);
     }
+
+    public boolean existsByLogin(String login) {
+        return userRepository.existsByLogin(login);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
 }

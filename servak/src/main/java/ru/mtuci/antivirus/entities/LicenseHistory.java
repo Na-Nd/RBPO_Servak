@@ -19,11 +19,12 @@ public class LicenseHistory {
 
     @ManyToOne
     @JoinColumn(name = "license_id")
+    @JsonBackReference
     private License license;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    //@JsonBackReference
+    @JsonBackReference
     private User user;
 
     @Column(name = "status")
