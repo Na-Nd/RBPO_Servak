@@ -1,7 +1,5 @@
-package ru.mtuci.antivirus.entities.DTO;
+package ru.mtuci.antivirus.entities.requests;
 
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.mtuci.antivirus.entities.*;
-import ru.mtuci.antivirus.entities.DTO.LicenseRequest;
+import ru.mtuci.antivirus.entities.requests.LicenseRequest;
 import ru.mtuci.antivirus.repositories.DeviceRepository;
 import ru.mtuci.antivirus.repositories.LicenseRepository;
 

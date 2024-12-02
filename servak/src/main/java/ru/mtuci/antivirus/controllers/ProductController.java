@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.mtuci.antivirus.entities.DTO.ProductRequest;
+import ru.mtuci.antivirus.entities.requests.ProductRequest;
 import ru.mtuci.antivirus.entities.Product;
 import ru.mtuci.antivirus.services.ProductService;
 

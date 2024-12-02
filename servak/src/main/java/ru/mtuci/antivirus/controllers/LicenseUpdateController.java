@@ -4,17 +4,19 @@ package ru.mtuci.antivirus.controllers;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.mtuci.antivirus.entities.DTO.LicenseUpdateRequest;
+import ru.mtuci.antivirus.entities.requests.LicenseUpdateRequest;
 import ru.mtuci.antivirus.entities.Ticket;
 import ru.mtuci.antivirus.services.AuthenticationService;
 import ru.mtuci.antivirus.services.LicenseService;
 
 //TODO: 1. Убрать лишние проверки ✅
 
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 @RestController
 @RequestMapping("/license")
 public class LicenseUpdateController {

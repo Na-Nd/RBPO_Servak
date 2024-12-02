@@ -2,7 +2,7 @@ package ru.mtuci.antivirus.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.mtuci.antivirus.entities.DTO.LicenseTypeRequest;
+import ru.mtuci.antivirus.entities.requests.LicenseTypeRequest;
 import ru.mtuci.antivirus.entities.LicenseType;
 import ru.mtuci.antivirus.repositories.LicenseTypeRepository;
 

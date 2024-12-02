@@ -2,8 +2,8 @@ package ru.mtuci.antivirus.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.mtuci.antivirus.entities.DTO.ActivationRequest;
-import ru.mtuci.antivirus.entities.DTO.DeviceRequest;
+import ru.mtuci.antivirus.entities.requests.ActivationRequest;
+import ru.mtuci.antivirus.entities.requests.DeviceRequest;
 import ru.mtuci.antivirus.entities.Device;
 import ru.mtuci.antivirus.entities.User;
 import ru.mtuci.antivirus.repositories.DeviceRepository;

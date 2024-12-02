@@ -2,7 +2,7 @@ package ru.mtuci.antivirus.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.mtuci.antivirus.entities.DTO.ProductRequest;
+import ru.mtuci.antivirus.entities.requests.ProductRequest;
 import ru.mtuci.antivirus.entities.Product;
 import ru.mtuci.antivirus.repositories.ProductRepository;
 

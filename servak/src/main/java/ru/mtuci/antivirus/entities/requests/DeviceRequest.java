@@ -1,4 +1,4 @@
-package ru.mtuci.antivirus.entities.DTO;
+package ru.mtuci.antivirus.entities.requests;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -6,14 +6,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ActivationRequest {
-
-    @NotBlank(message = "Activation code cannot be empty")
-    private String activationCode;
+public class DeviceRequest {
 
     @NotBlank(message = "Device name cannot be empty")
     private String deviceName;
 
     @NotBlank(message = "Mac address cannot be empty")
     private String macAddress;
+
+    private Long userId;
 }

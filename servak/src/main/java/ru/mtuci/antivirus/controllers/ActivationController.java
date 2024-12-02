@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import ru.mtuci.antivirus.entities.DTO.ActivationRequest;
+import ru.mtuci.antivirus.entities.requests.ActivationRequest;
 import ru.mtuci.antivirus.entities.*;
 import ru.mtuci.antivirus.services.*;
 
@@ -25,18 +25,8 @@ public class ActivationController {
         this.licenseService = licenseService;
     }
 
-
-    @GetMapping("/test")
-    public String test() {
-        return "ActivationController: Tested successfully";
-    }
-
     @PostMapping("/activate")
     public ResponseEntity<?> activateLicense(@Valid @RequestBody ActivationRequest activationRequest/*, BindingResult bindingResult*/) {
-
-        // TODO: (if needed) check bindingResult for validation errors (@NotBlank, etc.)
-
-        System.out.println("ActivationController: activateLicense: Started activating license, data: " + activationRequest.getActivationCode() + ", " + activationRequest.getDeviceName() + ", " + activationRequest.getMacAddress());
 
         try {
 
@@ -45,14 +35,10 @@ public class ActivationController {
                 return ResponseEntity.status(403).body("User is not authenticated");
             }
 
-            // Get authenticated user
-            System.out.println("ActivationController: activateLicense: Request from user: " + authentication.getName());
             User user = userService.findUserByLogin(authentication.getName());
 
-            // Register or update device
             Device device = deviceService.registerOrUpdateDevice(activationRequest, user);
 
-            // Activate license
             String activationCode = activationRequest.getActivationCode();
             String login = user.getLogin();
             Ticket ticket = licenseService.activateLicense(activationCode, device, login);

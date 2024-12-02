@@ -1,4 +1,4 @@
-package ru.mtuci.antivirus.entities.DTO;
+package ru.mtuci.antivirus.entities.requests;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
