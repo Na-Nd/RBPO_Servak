@@ -126,23 +126,33 @@ public class LicenseService{
         return license;
     }
 
-    public Ticket updateExistentLicense(String licenseCode, String login, String macAddress){
+    public Ticket updateExistentLicense(String licenseCode, String login, String macAddress) {
 
         License license = licenseRepository.getLicensesByCode(licenseCode);
-        if(license == null){
+        if (license == null) {
             throw new IllegalArgumentException("License not found");
         }
 
-        // Валидация с датой первой активации
-        if(license.getIsBlocked()){
+        // Проверка на заблокированность
+        if (license.getIsBlocked()) {
             throw new IllegalArgumentException("Лицензия заблокирована");
         }
 
-        if(license.getFirstActivationDate() == null){
-            throw new IllegalArgumentException("Лицензия не активироана");
+        // Проверка на активацию
+        if (license.getFirstActivationDate() == null) {
+            throw new IllegalArgumentException("Лицензия не активирована");
         }
 
-        // Обновление
+        // Проверка остатка времени до конца лицензии
+        long currentTimeMillis = System.currentTimeMillis();
+        long remainingTimeMillis = license.getEndingDate().getTime() - currentTimeMillis;
+
+        // TODO чтобы нельзя было накручивать себе активации
+        if (remainingTimeMillis > 1 * 60 * 60 * 1000) { // 1 час в миллисекундах
+            throw new IllegalArgumentException("Лицензию нельзя обновить: до истечения срока лицензии осталось более 1 часа");
+        }
+
+        // Обновление срока действия лицензии
         license.setEndingDate(new Date(license.getEndingDate().getTime() + license.getDuration()));
         licenseRepository.save(license);
 
@@ -153,6 +163,7 @@ public class LicenseService{
         // Тикет
         return generateTicket(license, deviceRepository.findDeviceByMacAddress(macAddress));
     }
+
 
     public Ticket generateTicket(License license, Device device){
         Ticket ticket = new Ticket();
