@@ -2,14 +2,14 @@ package ru.mtuci.antivirus.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
 @Entity
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "licence_history")
 public class LicenseHistory {
 
@@ -42,8 +42,5 @@ public class LicenseHistory {
         this.status = status;
         this.changeDate = changeDate;
         this.description = description;
-    }
-
-    public LicenseHistory() {
     }
 }

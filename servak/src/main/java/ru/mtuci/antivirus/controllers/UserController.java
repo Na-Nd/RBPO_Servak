@@ -1,5 +1,6 @@
 package ru.mtuci.antivirus.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,27 +15,21 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user")
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/info/{id}")
     public ResponseEntity<?> getUserInfo(@PathVariable Long id){
-        User user = userService.getUserById(id);
-        return ResponseEntity.status(200).body("Пользователь: " + user.toString());
+        return ResponseEntity.status(200).body("Пользователь: " + userService.getUserById(id).toString());
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/info")
     public ResponseEntity<List<User>> getUserInfo(){
-        List<User> users = userService.getAllUsers();
-        return ResponseEntity.status(200).body(users);
+        return ResponseEntity.status(200).body(userService.getAllUsers());
     }
 
     @PatchMapping("/update")
@@ -45,7 +40,7 @@ public class UserController {
 
             if (user.getLogin() != null && !user.getLogin().equals(currentUser.getLogin())) {
                 if (userService.existsByLogin(user.getLogin())) {
-                    return ResponseEntity.status(400).body("Ошибка: Логин уже используется");
+                    return ResponseEntity.status(400).body("Ошибка валидации: такой логин уже существует");
                 }
 
                 currentUser.setLogin(user.getLogin());
@@ -53,7 +48,7 @@ public class UserController {
 
             if (user.getEmail() != null && !user.getEmail().equals(currentUser.getEmail())) {
                 if (userService.existsByEmail(user.getEmail())) {
-                    return ResponseEntity.status(400).body("Ошибка: Email уже используется");
+                    return ResponseEntity.status(400).body("Ошибка валидации: такая почта уже существует");
                 }
                 currentUser.setEmail(user.getEmail());
             }
@@ -64,10 +59,10 @@ public class UserController {
 
             userService.saveUser(currentUser);
 
-            return ResponseEntity.status(200).body("Польователь: " + currentUser.getLogin() + " успешно обновлен");
+            return ResponseEntity.status(200).body("Данные пользователя " + currentUser.getLogin() + " обновлены");
 
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Ошибка при обновлении пользователя");
+            return ResponseEntity.status(500).body("Внутренняя ошибка сервера: " + e.getMessage());
         }
     }
 
@@ -75,12 +70,10 @@ public class UserController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id){
         try{
-            User user = userService.getUserById(id);
-
             userService.deleteUser(id);
             return ResponseEntity.status(200).body("Пользователь с id: " + id + " удален");
         } catch (Exception e){
-            return ResponseEntity.status(500).body("Ошибка при удалении пользователя");
+            return ResponseEntity.status(500).body("Внутренняя ошибка сервера: " + e.getMessage());
         }
     }
 }

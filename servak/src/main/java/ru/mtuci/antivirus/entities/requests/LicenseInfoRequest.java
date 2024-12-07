@@ -2,21 +2,17 @@ package ru.mtuci.antivirus.entities.requests;
 
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class LicenseInfoRequest {
 
-    @NotBlank(message = "MAC address cannot be empty")
+    @NotBlank(message = "MAC не может быть пустым")
     private String macAddress;
 
-    @NotBlank(message = "Code cannot be empty")
-    private String code;
+    @NotBlank(message = "Код лиценщзии не может быть пустым")
+    private String licenseCode;
 
 }

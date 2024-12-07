@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,8 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "users")
@@ -60,15 +56,6 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<LicenseHistory> licenseHistories;
 
-    public User(Long id, String login, String passwordHash, String email, ROLE role, List<License> licenses) {
-        this.id = id;
-        this.login = login;
-        this.passwordHash = passwordHash;
-        this.email = email;
-        this.role = role;
-        this.licenses = licenses;
-    }
-
     public User(String login, String passwordHash, String email, ROLE role, List<License> licenses, List<Device> devices, List<LicenseHistory> licenseHistories) {
         this.login = login;
         this.passwordHash = passwordHash;
@@ -79,12 +66,27 @@ public class User implements UserDetails {
         this.licenseHistories = licenseHistories;
     }
 
+    public User(String login, String passwordHash, String email, ROLE role, List<License> licenses, List<Device> devices) {
+        this.login = login;
+        this.passwordHash = passwordHash;
+        this.email = email;
+        this.role = role;
+        this.licenses = licenses;
+        this.devices = devices;
+    }
+
     public User(String login, String passwordHash, String email, ROLE role, List<License> licenses) {
         this.login = login;
         this.passwordHash = passwordHash;
         this.email = email;
         this.role = role;
         this.licenses = licenses;
+    }
+
+    public User(String login, String passwordHash, String email) {
+        this.login = login;
+        this.passwordHash = passwordHash;
+        this.email = email;
     }
 
     @Override
@@ -107,7 +109,6 @@ public class User implements UserDetails {
         return UserDetails.super.isEnabled();
     }
 
-    // TODO JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(role.toString()));
@@ -121,19 +122,5 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return login;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", login='" + login + '\'' +
-                ", passwordHash='" + passwordHash + '\'' +
-                ", email='" + email + '\'' +
-                ", role=" + role +
-                ", licenses=" + licenses +
-                ", devices=" + devices +
-                ", licenseHistories=" + licenseHistories + // TODO удалить
-                '}';
     }
 }

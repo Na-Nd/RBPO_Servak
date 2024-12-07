@@ -1,5 +1,6 @@
 package ru.mtuci.antivirus.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.mtuci.antivirus.entities.requests.ActivationRequest;
@@ -14,16 +15,11 @@ import java.util.List;
 //TODO: 1. Пересмотреть логику обновления пользователя устройства ✅
 
 @Service
+@RequiredArgsConstructor
 public class DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final UserRepository userRepository;
-
-    @Autowired
-    public DeviceService(DeviceRepository deviceRepository, UserRepository userRepository) {
-        this.deviceRepository = deviceRepository;
-        this.userRepository = userRepository;
-    }
 
     public Device registerOrUpdateDevice(ActivationRequest activationRequest, User user) {
 
@@ -33,7 +29,7 @@ public class DeviceService {
             device.setMacAddress(activationRequest.getMacAddress());  // TODO: 1 переделана логика метода
             device.setUser(user);
         } else if (!device.getUser().equals(user)) {
-            throw new IllegalArgumentException("Device already registered by another user");
+            throw new IllegalArgumentException("Устройство зарегистрировано другим пользователем");
         }
 
         device.setName(activationRequest.getDeviceName());
@@ -47,7 +43,7 @@ public class DeviceService {
 
     public Device createDevice(DeviceRequest deviceRequest) {
         User user = userRepository.findById(deviceRequest.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
         Device device = new Device();
         device.setName(deviceRequest.getDeviceName());
         device.setMacAddress(deviceRequest.getMacAddress());
@@ -56,13 +52,13 @@ public class DeviceService {
     }
 
     public Device getDeviceById(Long id) {
-        return deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Device not found"));
+        return deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Устройство не найдено"));
     }
 
     public Device updateDevice(Long id, DeviceRequest deviceRequest) {
         Device device = getDeviceById(id);
         User user = userRepository.findById(deviceRequest.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
         device.setName(deviceRequest.getDeviceName());
         device.setMacAddress(deviceRequest.getMacAddress());
         device.setUser(user);
@@ -77,4 +73,7 @@ public class DeviceService {
         return deviceRepository.findAll();
     }
 
+    public Device getDeviceByMacAddress(String macAddress) {
+        return deviceRepository.findDeviceByMacAddress(macAddress);
+    }
 }

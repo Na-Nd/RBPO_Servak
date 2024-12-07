@@ -1,6 +1,7 @@
 package ru.mtuci.antivirus.controllers;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,62 +18,58 @@ import ru.mtuci.antivirus.entities.User;
 import ru.mtuci.antivirus.services.UserService;
 import ru.mtuci.antivirus.utils.JwtUtil;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;;
 
-    @Autowired
-    public AuthController(UserService userService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
-    }
-
-    @PostMapping("/test")
-    public String test() {
-        return "Tested successfully";
-    }
-
     @PostMapping("/register")
     public ResponseEntity<?> userRegistration(@Valid @RequestBody UserRegisterDTO userDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Validation error: " + bindingResult.getAllErrors());
+            String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
+            return ResponseEntity.badRequest().body("Ошибка валидации: " + errMsg);
         }
 
-        if(userService.findUserByLogin(userDTO.getLogin()) != null){
-            return ResponseEntity.badRequest().body("User with this login already exists");
+        if(userService.existsByLogin(userDTO.getLogin())){
+            return ResponseEntity.status(400).body("Ошибка валидации: пользователь с этим логином уже существует");
+        }
+
+        if(userService.existsByEmail(userDTO.getEmail())){
+            return ResponseEntity.status(400).body("Ошибка валидации: пользователь с такой почтой уже существует");
         }
 
         User user = new User(userDTO.getLogin(), passwordEncoder.encode(userDTO.getPassword()), userDTO.getEmail(), ROLE.ROLE_USER, null);
         userService.saveUser(user);
 
-        UserDetails userDetails = userService.loadUserByUsername(user.getUsername());
-        String token = jwtUtil.generateToken(userDetails);
+        String token = jwtUtil.generateToken(userService.loadUserByUsername(user.getUsername()));
 
-        return ResponseEntity.ok("Registration competed, JWT: " + token);
+        return ResponseEntity.status(200).body("Регистрация пройдена, JWT: " + token);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> userLogin(@Valid @RequestBody UserLoginDTO userDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Validation error: " + bindingResult.getAllErrors());
+        if(bindingResult.hasErrors()){
+            String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
+            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
         }
 
         User user = userService.findUserByLogin(userDTO.getLogin());
 
         if(user == null){
-            return ResponseEntity.badRequest().body("User not found");
+            return ResponseEntity.status(400).body("Ошибка валидации: пользователь не найден");
         }
 
         if(!passwordEncoder.matches(userDTO.getPassword(), user.getPassword())){
-            return ResponseEntity.status(401).build();
+            return ResponseEntity.status(400).body("Ошибка валидации: пароль неверный");
         }
 
         String token = jwtUtil.generateToken(userService.loadUserByUsername(user.getUsername()));
-        return ResponseEntity.ok("Login completed, JWT: " + token);
+        return ResponseEntity.status(200).body("Логин пройден, JWT: " + token);
     }
 }

@@ -1,6 +1,7 @@
 package ru.mtuci.antivirus.controllers;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,52 +12,51 @@ import ru.mtuci.antivirus.entities.LicenseType;
 import ru.mtuci.antivirus.services.LicenseTypeService;
 
 import java.util.List;
+import java.util.Objects;
 
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 @RestController
 @RequestMapping("/license-types")
+@RequiredArgsConstructor
 public class LicenseTypeController {
 
     private final LicenseTypeService licenseTypeService;
 
-    @Autowired
-    public LicenseTypeController(LicenseTypeService licenseTypeService) {
-        this.licenseTypeService = licenseTypeService;
-    }
-
     @PostMapping
-    public ResponseEntity<?> createLicenseType(@Valid @RequestBody LicenseTypeRequest licenseTypeRequest, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+    public ResponseEntity<?> createLicenseType(@Valid @RequestBody LicenseTypeRequest licenseTypeRequest, BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
+            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
         }
+
         LicenseType licenseType = licenseTypeService.createLicenseType(licenseTypeRequest);
-        return ResponseEntity.ok(licenseType);
+        return ResponseEntity.status(200).body(licenseType);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getLicenseType(@PathVariable Long id) {
-        LicenseType licenseType = licenseTypeService.getLicenseTypeById(id);
-        return ResponseEntity.ok(licenseType);
+    public ResponseEntity<?> getLicenseTypeById(@PathVariable Long id){
+        return ResponseEntity.status(200).body(licenseTypeService.getLicenseTypeById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateLicenseType(@PathVariable Long id, @Valid @RequestBody LicenseTypeRequest licenseTypeRequest, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+    public ResponseEntity<?> updateLicenseType(@PathVariable Long id, @Valid @RequestBody LicenseTypeRequest licenseTypeRequest, BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
+            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
         }
+
         LicenseType licenseType = licenseTypeService.updateLicenseType(id, licenseTypeRequest);
-        return ResponseEntity.ok(licenseType);
+        return ResponseEntity.status(200).body(licenseType);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLicenseType(@PathVariable Long id) {
+    public ResponseEntity<String> deleteLicenseTypeById(@PathVariable Long id){
         licenseTypeService.deleteLicenseType(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(200).body("Тип лицензии с id: " + id + " удален");
     }
 
     @GetMapping
-    public ResponseEntity<List<LicenseType>> getAllLicenseTypes() {
-        List<LicenseType> licenseTypes = licenseTypeService.getAllLicenseTypes();
-        return ResponseEntity.ok(licenseTypes);
+    public ResponseEntity<List<LicenseType>> getAllLicenseTypes(){
+        return ResponseEntity.status(200).body(licenseTypeService.getAllLicenseTypes());
     }
 }

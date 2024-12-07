@@ -3,16 +3,16 @@ package ru.mtuci.antivirus.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "licenses")
+@AllArgsConstructor
+@NoArgsConstructor
 public class License {
 
     @Id
@@ -25,7 +25,7 @@ public class License {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     @JsonBackReference
-    private User user;
+    private User user; // TODO вот тут должен быть список если хотим чтобы активировать могли несколько человек
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
@@ -96,32 +96,22 @@ public class License {
         this.description = description;
     }
 
-    public License() {
+    @Override
+    public String toString() {
+        return "License{" +
+                "id=" + id +
+                ", code='" + code + '\'' +
+                ", user=" + (user != null ? user.getId() : null) +
+                ", productId=" + (product != null ? product.getId() : null) +
+                ", type=" + (type != null ? type.getName() : null) +
+                ", firstActivationDate=" + firstActivationDate +
+                ", endingDate=" + endingDate +
+                ", isBlocked=" + isBlocked +
+                ", devicesCount=" + devicesCount +
+                ", owner=" + (owner != null ? owner.getId() : null) +
+                ", duration=" + duration +
+                ", description='" + description + '\'' +
+                '}';
     }
 
-    public String getBody(){
-        return String.format("License:\n" +
-                "Code: %s\n" +
-                "User: %s\n" +
-                "Product: %s\n" +
-                "Type: %s\n" +
-                "First activation date: %s\n" +
-                "Ending date: %s\n" +
-                "Is blocked: %b\n" +
-                "Devices count: %d\n" +
-                "Owner: %s\n" +
-                "Duration: %d\n" +
-                "Description: %s\n",
-                this.getCode(),
-                this.getUser().getLogin(),
-                this.getProduct().getName(),
-                this.getType().getName(),
-                this.getFirstActivationDate(),
-                this.getEndingDate(),
-                this.getIsBlocked(),
-                this.getDevicesCount(),
-                this.getOwner().getLogin(),
-                this.getDuration(),
-                this.getDescription());
-    }
 }

@@ -2,25 +2,29 @@ package ru.mtuci.antivirus.entities.DTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRegisterDTO {
 
-    @NotBlank(message = "login cannot be empty")
+    @NotBlank(message = "Логин не может быть пустым")
     private String login;
 
-    @NotBlank(message = "password cannot be empty")
+    @NotBlank(message = "Пароль не может быть пустым")
     private String password;
 
-    @NotBlank(message = "email cannot be empty")
+    @NotBlank(message = "Почта не может быть пустой")
     @Email(message = "Почта должна быть в верном формате")
     private String email;
 
+    @Override
+    public String toString() {
+        return "UserRegisterDTO{" +
+                "login='" + login + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }

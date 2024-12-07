@@ -3,14 +3,14 @@ package ru.mtuci.antivirus.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "devices")
 public class Device {
 
@@ -33,25 +33,17 @@ public class Device {
     @JsonManagedReference
     private List<DeviceLicense> deviceLicenses;
 
-    public Device(String name, String macAddress, User user, List<DeviceLicense> deviceLicenses) {
-        this.name = name;
-        this.macAddress = macAddress;
-        this.user = user;
-        this.deviceLicenses = deviceLicenses;
-    }
-
     public Device() {
     }
 
-    public String getBody(){
-        return String.format(
-                "Device:\n" +
-                "id: %d\n" +
-                "name: %s\n" +
-                "macAddress: %s\n" +
-                "user: %s\n" +
-                "deviceLicenses: %s\n",
-                id, name, macAddress, user, deviceLicenses
-        );
+    @Override
+    public String toString() {
+        return "Device{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", macAddress='" + macAddress + '\'' +
+                ", user=" + user +
+                ", deviceLicenses=" + deviceLicenses +
+                '}';
     }
 }

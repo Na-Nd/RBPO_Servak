@@ -2,46 +2,45 @@ package ru.mtuci.antivirus.controllers;
 
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.mtuci.antivirus.entities.requests.LicenseUpdateRequest;
 import ru.mtuci.antivirus.entities.Ticket;
-import ru.mtuci.antivirus.services.AuthenticationService;
 import ru.mtuci.antivirus.services.LicenseService;
+
+import java.util.Objects;
 
 //TODO: 1. Убрать лишние проверки ✅
 
 @RestController
 @RequestMapping("/license")
+@RequiredArgsConstructor
 public class LicenseUpdateController {
 
-    private final AuthenticationService authenticationService;
     private final LicenseService licenseService;
 
-    @Autowired
-    public LicenseUpdateController(AuthenticationService authenticationService, LicenseService licenseService) {
-        this.authenticationService = authenticationService;
-        this.licenseService = licenseService;
-    }
-
-
     @PostMapping("/update")
-    public ResponseEntity<?> updateLicense(@Valid @RequestBody LicenseUpdateRequest updateRequest){
-        try { // TODO: 1 убрана лишняя проверка аутентификации
+    public ResponseEntity<?> update(@Valid @RequestBody LicenseUpdateRequest licenseUpdateRequest, BindingResult bindingResult){
+        if(bindingResult.hasErrors()){
+            String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
+            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
+        }
 
-            Ticket ticket = licenseService.updateExistentLicense(updateRequest.getLicenseKey(), updateRequest.getLogin());
-            if (ticket.getIsBlocked()) {
-                return ResponseEntity.status(400).body("License update unavailable: " + ticket.getSignature());
-            }
+        try{
+            Ticket ticket = licenseService.updateExistentLicense(
+                    licenseUpdateRequest.getLicenseCode(),
+                    licenseUpdateRequest.getLogin(),
+                    licenseUpdateRequest.getMacAddress()
+            );
 
-            return ResponseEntity.ok("License update successful, Ticket:\n" + ticket.getBody());
+            return ResponseEntity.status(200).body("Успешное обновление лицензии, тикет: " + ticket.toString());
         } catch (IllegalArgumentException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.status(400).body(e.getMessage());
         }
     }
 }
