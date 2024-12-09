@@ -186,10 +186,13 @@ public class LicenseService{
         //            throw new IllegalArgumentException("Неправильный пользователь");
         //        }
 
+        User user = userService.findUserByLogin(login);
         // Верхняя проверка не имеет смысла так как: для того чтобы два юзера активировали одно лицензию нужен список из юзеров в столбце user_id,
         // и еще если сравнивать владельца с юзером из столбца user_id то от верхнех проверки нет смысла
         if(license.getUser() != null){ // И теперь спереть лицуху не получится
-            throw new IllegalArgumentException("Лицензия уже активирована");
+            if(!(license.getUser().getId().equals(user.getId()))){
+                throw new IllegalArgumentException("Неправильный пользователь");
+            }
         }
 
         // Заблокирована
