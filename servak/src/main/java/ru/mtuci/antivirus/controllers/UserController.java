@@ -32,6 +32,7 @@ public class UserController {
         return ResponseEntity.status(200).body(userService.getAllUsers());
     }
 
+    // TODO тоже POST для клиента
     @PatchMapping("/update")
     public ResponseEntity<String> updateUser(@RequestBody UserRequest user, @AuthenticationPrincipal UserDetails userDetails) {
         try {

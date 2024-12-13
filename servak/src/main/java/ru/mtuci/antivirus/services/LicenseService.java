@@ -191,7 +191,7 @@ public class LicenseService{
         // и еще если сравнивать владельца с юзером из столбца user_id то от верхнех проверки нет смысла
         if(license.getUser() != null){ // И теперь спереть лицуху не получится
             if(!(license.getUser().getId().equals(user.getId()))){
-                throw new IllegalArgumentException("Неправильный пользователь");
+                throw new IllegalArgumentException("Неправильный пользователь"); // TODO Лицензия уже активирована (это для клиента)
             }
         }
 

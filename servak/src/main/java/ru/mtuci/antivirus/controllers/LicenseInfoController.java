@@ -32,6 +32,7 @@ public class LicenseInfoController {
     private final LicenseService licenseService;
     private final UserService userService;
 
+    // TODO сделать POST, так как curl не распознает GET
     @GetMapping("/info")
     public ResponseEntity<?> getLicenseInfo(@Valid @RequestBody LicenseInfoRequest licenseInfoRequest, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
