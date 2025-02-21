@@ -7,10 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.mtuci.antivirus.entities.DTO.UserLoginDTO;
 import ru.mtuci.antivirus.entities.DTO.UserRegisterDTO;
 import ru.mtuci.antivirus.entities.ENUMS.ROLE;
@@ -27,7 +24,12 @@ public class AuthController {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;;
+    private final JwtUtil jwtUtil;
+
+    @GetMapping("/greeting")
+    public String test(){
+        return "Hello emae";
+    }
 
     @PostMapping("/register")
     public ResponseEntity<?> userRegistration(@Valid @RequestBody UserRegisterDTO userDTO, BindingResult bindingResult) {
@@ -49,7 +51,7 @@ public class AuthController {
 
         String token = jwtUtil.generateToken(userService.loadUserByUsername(user.getUsername()));
 
-        return ResponseEntity.status(200).body("Регистрация пройдена, JWT: " + token);
+        return ResponseEntity.status(200).body("Registration successful, JWT{Bearer " + token + "}");
     }
 
     @PostMapping("/login")
@@ -70,6 +72,6 @@ public class AuthController {
         }
 
         String token = jwtUtil.generateToken(userService.loadUserByUsername(user.getUsername()));
-        return ResponseEntity.status(200).body("Логин пройден, JWT: " + token);
+        return ResponseEntity.status(200).body("Login successful, JWT{Bearer " + token + "}");
     }
 }
