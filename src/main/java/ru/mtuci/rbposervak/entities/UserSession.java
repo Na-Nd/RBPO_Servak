@@ -38,5 +38,9 @@ public class UserSession {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Version
+    @Column(name = "version")
+    private Long version;
 }
 
