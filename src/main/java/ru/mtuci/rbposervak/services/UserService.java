@@ -77,6 +77,7 @@ public class UserService implements UserDetailsService {
                 .email(userDTO.getEmail())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
                 .role(ROLE.ROLE_USER)
+                .isBlocked(false)
                 .build();
 
         // Сохраняем и создаем сессию
@@ -87,7 +88,7 @@ public class UserService implements UserDetailsService {
 
     /// Логин
     public UserSession loginUser(UserLoginDTO userDTO){
-        User user = userRepository.findByUsername(userDTO.getLogin())
+        User user = userRepository.findUserByLogin(userDTO.getLogin())
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
         // Проверка пароля

@@ -54,7 +54,7 @@ public class UserController {
             }
 
             if (user.getPasswordHash() != null) {
-                currentUser.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+                currentUser.setPassword(passwordEncoder.encode(user.getPasswordHash()));
             }
 
             userService.saveUser(currentUser);

@@ -1,6 +1,7 @@
 package ru.mtuci.rbposervak.controllers;
 
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,11 @@ public class AuthController {
     @Autowired
     public AuthController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping("/greeting")
+    public String greeting() {
+        return "Hello World!";
     }
 
     @PostMapping("/register")

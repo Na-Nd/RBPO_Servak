@@ -2,7 +2,7 @@ package ru.mtuci.rbposervak.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.mtuci.rbposervak.entities.ENUMS.STATUS;
+import ru.mtuci.rbposervak.entities.ENUMS.session.STATUS;
 
 import java.time.LocalDateTime;
 

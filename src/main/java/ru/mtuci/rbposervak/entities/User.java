@@ -35,7 +35,7 @@ public class User implements UserDetails {
     private String login;
 
     @NotBlank(message = "Пароль не может быть пустым")
-    @Column(name = "password_hash")
+    @Column(name = "password")
     private String password;
 
     @Column(name = "email")
@@ -45,8 +45,8 @@ public class User implements UserDetails {
     @Column(name = "role")
     private ROLE role;
 
-    @Column(name = "id_blocked")
-    private Boolean isBlocked = false;
+    @Column(name = "is_blocked")
+    private Boolean isBlocked;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
@@ -63,6 +63,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSession> sessions;
+
+    @OneToMany(mappedBy = "changedByUser", cascade = CascadeType.ALL)
+    private List<SignatureAudit> signatureAudits;
 
     public User(String login, String passwordHash, String email, ROLE role, List<License> licenses, List<Device> devices, List<LicenseHistory> licenseHistories) {
         this.login = login;
@@ -104,7 +107,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return !Boolean.TRUE.equals(isBlocked); // Аккаунт не заблокирован, если isBlocked == false
+        return isBlocked; // Аккаунт не заблокирован, если isBlocked == false
     }
 
     @Override
