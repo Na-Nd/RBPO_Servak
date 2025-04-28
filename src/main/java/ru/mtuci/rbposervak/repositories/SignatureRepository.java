@@ -8,6 +8,7 @@ import ru.mtuci.rbposervak.entities.ENUMS.signature.STATUS;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -21,7 +22,8 @@ public interface SignatureRepository extends JpaRepository<Signature, UUID> {
 
     List<Signature> findByIdIn(List<UUID> ids);
 
-    List<Signature> findByStatus(STATUS status);
+
+    Optional<List<Signature>> findByStatus(STATUS status);
 
     List<Signature> findByUpdatedAtAfterAndStatus(LocalDateTime date, STATUS status);
 }

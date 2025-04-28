@@ -10,38 +10,54 @@ import ru.mtuci.rbposervak.entities.ENUMS.signature.STATUS;
 import ru.mtuci.rbposervak.entities.Signature;
 import ru.mtuci.rbposervak.entities.SignatureAudit;
 import ru.mtuci.rbposervak.services.SignatureService;
+import ru.mtuci.rbposervak.utils.SignatureUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-// TODO try-catch'и
 @RestController
 @RequestMapping("/signatures")
 public class SignatureController {
     private final SignatureService signatureService;
+    private final SignatureUtil signatureUtil;
 
     @Autowired
-    public SignatureController(SignatureService signatureService) {
+    public SignatureController(SignatureService signatureService, SignatureUtil signatureUtil) {
         this.signatureService = signatureService;
+        this.signatureUtil = signatureUtil;
     }
 
     /// Получение всей базы (только актуальные)
     @GetMapping
-    public ResponseEntity<List<Signature>> getAllActual() {
-        return ResponseEntity.status(200).body(signatureService.getAllActualSignatures());
+    public ResponseEntity<?> getAllActual() {
+        try{
+            return ResponseEntity.status(200).body(signatureService.getAllActualSignatures());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 
     /// Получение диффа (все записи с указанной даты)
     @GetMapping("/modified-after")
-    public ResponseEntity<List<Signature>> getModifiedAfter(@RequestParam LocalDateTime since) {
-        return ResponseEntity.status(200).body(signatureService.getSignaturesModifiedAfter(since));
+    public ResponseEntity<?> getModifiedAfter(@RequestParam LocalDateTime since) {
+        try{
+            return ResponseEntity.status(200).body(signatureService.getSignaturesModifiedAfter(since));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+
     }
 
     /// Получение по списку идентификаторов
     @PostMapping("/by-ids")
-    public ResponseEntity<List<Signature>> getByIds(@RequestBody List<UUID> ids) {
-        return ResponseEntity.status(200).body(signatureService.getSignaturesByIds(ids));
+    public ResponseEntity<?> getByIds(@RequestBody List<UUID> ids) {
+        try{
+            return ResponseEntity.status(200).body(signatureService.getSignaturesByIds(ids));
+        } catch (RuntimeException e){
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+
     }
 
     /// Добавление новой сигнатуры
@@ -49,7 +65,7 @@ public class SignatureController {
     public ResponseEntity<?> createSignature(@Valid @RequestBody Signature signature, @AuthenticationPrincipal UserDetails userDetails) {
         try {
             return ResponseEntity.status(200).body(signatureService.addSignature(signature, userDetails));
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
@@ -71,14 +87,24 @@ public class SignatureController {
     /// Удаление (смена статуса) сигнатуры
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSignature(@PathVariable UUID id, @RequestHeader("Authorization") String authBearer) {
-        signatureService.deleteSignature(id, authBearer);
-        return ResponseEntity.status(200).body("Успешное удаление сигнатуры");
+        try{
+            signatureService.deleteSignature(id, authBearer);
+            return ResponseEntity.status(200).body("Успешное удаление сигнатуры");
+        } catch (RuntimeException e){
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
+
     }
 
     /// Получение сигнатур по статусу
     @GetMapping("/by-status/{status}")
-    public ResponseEntity<List<Signature>> getByStatus(@PathVariable STATUS status) {
-        return ResponseEntity.status(200).body(signatureService.getSignaturesByStatus(status));
+    public ResponseEntity<?> getByStatus(@PathVariable STATUS status) {
+        try {
+            return ResponseEntity.status(200).body(signatureService.getSignaturesByStatus(status));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+
     }
 
     /// Получение аудита по сигнатуре
@@ -95,7 +121,7 @@ public class SignatureController {
             return ResponseEntity.status(404).body(null);
         }
 
-        if (!signatureService.verifySignature(signature)) {
+        if (!signatureUtil.verifySignature(signature)) {
             signatureService.markAsCorrupted(id, "Ошибка верификации");
             return ResponseEntity.status(200).body("Сигнатура невалидна, помечена как  CORRUPTED.");
         }

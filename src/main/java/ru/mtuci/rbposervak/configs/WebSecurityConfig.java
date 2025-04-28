@@ -29,7 +29,18 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
                 .authorizeHttpRequests( (requests) -> requests
-                        .requestMatchers("/auth/login","/auth/register", "/auth/greeting").permitAll()
+
+                        .requestMatchers(
+                                "/auth/login",
+                                "/auth/register",
+                                "/auth/greeting")
+                        .permitAll()
+
+                        .requestMatchers(
+                                "/signatures/**",
+                                "/api/signatures/**"
+                        ).hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

@@ -13,8 +13,8 @@ import ru.mtuci.rbposervak.repositories.SignatureAuditRepository;
 import ru.mtuci.rbposervak.repositories.SignatureHistoryRepository;
 import ru.mtuci.rbposervak.repositories.SignatureRepository;
 import ru.mtuci.rbposervak.utils.JwtUtil;
+import ru.mtuci.rbposervak.utils.SignatureUtil;
 
-import java.security.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -24,12 +24,10 @@ public class SignatureService {
     private final SignatureRepository signatureRepository;
     private final SignatureHistoryRepository historyRepository;
     private final SignatureAuditRepository auditRepository;
-    private final PrivateKey privateKey;
-    private final PublicKey publicKey;
+    private final SignatureUtil signatureUtil;
     private final JwtUtil jwtUtil;
     private final UserService userService;
 
-    // TODO util
     /// Константа для периодической проверки
     private static final long VERIFICATION_INTERVAL_HOURS = 24;
 
@@ -39,7 +37,7 @@ public class SignatureService {
 
         signature.setUpdatedAt(LocalDateTime.now());
         signature.setStatus(STATUS.ACTUAL);
-        signSignature(signature);
+        signatureUtil.signSignature(signature);
         Signature saved = signatureRepository.save(signature);
         logAudit(saved, createdBy, ChangeType.CREATED, "Создана новая сигнатура");
         return saved;
@@ -60,16 +58,16 @@ public class SignatureService {
                     saveToHistory(existing);
 
                     // Обновляем поля
-                    updateChangedFields(existing, updatedSignature);
+                    signatureUtil.updateChangedFields(existing, updatedSignature);
 
                     // Подписываем новую версию
-                    signSignature(existing);
+                    signatureUtil.signSignature(existing);
 
                     // Сохраняем в основную таблицу
                     Signature saved = signatureRepository.save(existing);
 
                     // И создаем новую запись в аудите
-                    logAudit(saved, changedBy, ChangeType.UPDATED, getChangedFields(existing, updatedSignature));
+                    logAudit(saved, changedBy, ChangeType.UPDATED, signatureUtil.getChangedFields(existing, updatedSignature));
 
                     return saved;
                 }).orElseThrow(() -> new RuntimeException("Сигнатура не найдена"));
@@ -106,144 +104,27 @@ public class SignatureService {
         auditRepository.save(audit);
     }
 
-    // TODO util
-    /// Обновление измененный полей
-    private void updateChangedFields(Signature existing, Signature updated) {
-        if (updated.getThreatName() != null) existing.setThreatName(updated.getThreatName());
-        if (updated.getFirstBytes() != null) existing.setFirstBytes(updated.getFirstBytes());
-        if (updated.getRemainderHash() != null) existing.setRemainderHash(updated.getRemainderHash());
-        if (updated.getRemainderLength() != 0) existing.setRemainderLength(updated.getRemainderLength());
-        if (updated.getFileType() != null) existing.setFileType(updated.getFileType());
-        if (updated.getOffsetStart() != 0) existing.setOffsetStart(updated.getOffsetStart());
-        if (updated.getOffsetEnd() != 0) existing.setOffsetEnd(updated.getOffsetEnd());
-        existing.setUpdatedAt(LocalDateTime.now());
-    }
-
-    // TODO util
-    /// Список изменений
-    private String getChangedFields(Signature oldVersion, Signature newVersion) {
-        StringBuilder changes = new StringBuilder();
-
-        // Сравнение threatName
-        if (!Objects.equals(oldVersion.getThreatName(), newVersion.getThreatName())) {
-            changes.append("threatName: ")
-                    .append(oldVersion.getThreatName())
-                    .append(" -> ")
-                    .append(newVersion.getThreatName())
-                    .append("; ");
-        }
-
-        // Сравнение firstBytes (сравниваем массивы байт)
-        if (!Arrays.equals(oldVersion.getFirstBytes(), newVersion.getFirstBytes())) {
-            changes.append("firstBytes: [changed]; ");
-        }
-
-        // Сравнение remainderHash
-        if (!Objects.equals(oldVersion.getRemainderHash(), newVersion.getRemainderHash())) {
-            changes.append("remainderHash: ")
-                    .append(oldVersion.getRemainderHash())
-                    .append(" -> ")
-                    .append(newVersion.getRemainderHash())
-                    .append("; ");
-        }
-
-        // Сравнение remainderLength
-        if (oldVersion.getRemainderLength() != newVersion.getRemainderLength()) {
-            changes.append("remainderLength: ")
-                    .append(oldVersion.getRemainderLength())
-                    .append(" -> ")
-                    .append(newVersion.getRemainderLength())
-                    .append("; ");
-        }
-
-        // Сравнение fileType
-        if (!Objects.equals(oldVersion.getFileType(), newVersion.getFileType())) {
-            changes.append("fileType: ")
-                    .append(oldVersion.getFileType())
-                    .append(" -> ")
-                    .append(newVersion.getFileType())
-                    .append("; ");
-        }
-
-        // Сравнение offsetStart
-        if (oldVersion.getOffsetStart() != newVersion.getOffsetStart()) {
-            changes.append("offsetStart: ")
-                    .append(oldVersion.getOffsetStart())
-                    .append(" -> ")
-                    .append(newVersion.getOffsetStart())
-                    .append("; ");
-        }
-
-        // Сравнение offsetEnd
-        if (oldVersion.getOffsetEnd() != newVersion.getOffsetEnd()) {
-            changes.append("offsetEnd: ")
-                    .append(oldVersion.getOffsetEnd())
-                    .append(" -> ")
-                    .append(newVersion.getOffsetEnd())
-                    .append("; ");
-        }
-
-        // Сравнение digitalSignature
-        if (!Objects.equals(oldVersion.getDigitalSignature(), newVersion.getDigitalSignature())) {
-            changes.append("digitalSignature: [changed]; ");
-        }
-
-        // Сравнение status
-        if (oldVersion.getStatus() != newVersion.getStatus()) {
-            changes.append("status: ")
-                    .append(oldVersion.getStatus())
-                    .append(" -> ")
-                    .append(newVersion.getStatus())
-                    .append("; ");
-        }
-
-        return changes.toString().trim();
-    }
-
-    // TODO util
-    /// Вычисление хэша для подписи и сама подпись
-    private void signSignature(Signature signature) {
-        try {
-            String data = buildSignableData(signature);
-            byte[] hash = calculateHash(data);
-            byte[] digitalSignature = signData(hash);
-            signature.setDigitalSignature(Base64.getEncoder().encodeToString(digitalSignature));
-        } catch (Exception e) {
-            throw new RuntimeException("Ошибка при подписании сигнатуры: " + e.getMessage());
-        }
-    }
-
-    //TODO util
-    /// Проверка подписи
-    public boolean verifySignature(Signature signature) {
-        try {
-            String dataToVerify = buildSignableData(signature);
-            byte[] hash = calculateHash(dataToVerify);
-            byte[] signatureBytes = Base64.getDecoder().decode(signature.getDigitalSignature());
-
-            // Используем сигнатуру из java.security.Signature для подписания (полное имя класса чтоб не путалось)
-            java.security.Signature sig = java.security.Signature.getInstance("SHA256withRSA");
-            sig.initVerify(publicKey);
-            sig.update(hash);
-            return sig.verify(signatureBytes);
-        } catch (Exception e) {
-            throw new RuntimeException("Ошибка при проверке подписи", e);
-        }
-    }
-
-    /// Получение всех сигнатур
+    /// Получение всех сигнатур (мб понадобится)
     public List<Signature> getAllSignatures() {
         return signatureRepository.findAll();
     }
 
     /// Получение всех актуальных сигнатур
     public List<Signature> getAllActualSignatures() {
-        return signatureRepository.findAllActual();
+        List<Signature> signatures = signatureRepository.findAllActual();
+        if(signatures.isEmpty()) {
+            throw new RuntimeException("Актуальные сигнатуры не найдены");
+        }
+        return signatures;
     }
 
     /// Получение сигнатур по списку идентификаторов
     public List<Signature> getSignaturesByIds(List<UUID> ids) {
-        return signatureRepository.findByIdIn(ids);
+        List<Signature> signatures = signatureRepository.findByIdIn(ids);
+        if(signatures.isEmpty()) {
+            throw new RuntimeException("Сигнатуры с идентификаторами: " + ids + " не найдены");
+        }
+        return signatures;
     }
 
     /// Удаление (смена статуса) сигнатуры
@@ -271,37 +152,11 @@ public class SignatureService {
 
     /// Получение изменений после конкретной даты
     public List<Signature> getSignaturesModifiedAfter(LocalDateTime date) {
-        return signatureRepository.findByUpdatedAtAfter(date);
-    }
-
-    // TODO util
-    /// Формирование данных для подписи
-    private String buildSignableData(Signature signature) {
-        return String.join("|",
-                signature.getThreatName(),
-                Base64.getEncoder().encodeToString(signature.getFirstBytes()),
-                signature.getRemainderHash(),
-                String.valueOf(signature.getRemainderLength()),
-                signature.getFileType(),
-                String.valueOf(signature.getOffsetStart()),
-                String.valueOf(signature.getOffsetEnd()),
-                signature.getUpdatedAt().toString());
-    }
-
-    // TODO util
-    /// Вычисление хэша
-    private byte[] calculateHash(String data) throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        return digest.digest(data.getBytes());
-    }
-
-    // TODO util
-    /// Подпись
-    private byte[] signData(byte[] hash) throws Exception {
-        java.security.Signature signature = java.security.Signature.getInstance("SHA256withRSA");
-        signature.initSign(privateKey);
-        signature.update(hash);
-        return signature.sign();
+        List<Signature> signatures = signatureRepository.findByUpdatedAtAfter(date);
+        if(signatures.isEmpty()) {
+            throw new RuntimeException("Изменения после даты: " + date + " не найдены");
+        }
+        return signatures;
     }
 
     /// Пометка как CORRUPTED
@@ -317,7 +172,6 @@ public class SignatureService {
         logAudit(signature, null, ChangeType.CORRUPTED, "Сигнатура помечена как CORRUPTED: " + reason);
     }
 
-    // TODO util
     /// Периодическая проверка ЭЦП
     @Scheduled(fixedRate = VERIFICATION_INTERVAL_HOURS * 60 * 60 * 1000)
     public void verifySignaturesPeriodically() {
@@ -326,7 +180,7 @@ public class SignatureService {
                 .findByUpdatedAtAfterAndStatus(lastCheckTime, STATUS.ACTUAL);
 
         signaturesToCheck.forEach(signature -> {
-            if (!verifySignature(signature)) {
+            if (!signatureUtil.verifySignature(signature)) {
                 markAsCorrupted(signature.getId(), "Ошибка проверки эцп сигнатуры: " + signature.getId());
             }
         });
@@ -334,7 +188,8 @@ public class SignatureService {
 
     /// Получение записей по статусу
     public List<Signature> getSignaturesByStatus(STATUS status) {
-        return signatureRepository.findByStatus(status);
+        return signatureRepository.findByStatus(status)
+                .orElseThrow(() -> new RuntimeException("Записи со статусом " + status.toString() + " не найдены"));
     }
 
     /// Получение аудита по сигнатуре
