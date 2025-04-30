@@ -27,6 +27,7 @@ public class Signature {
     @Column(name = "threat_name", columnDefinition = "TEXT")
     private String threatName;
 
+    // мб блоб
     @Column(name = "first_bytes", columnDefinition = "BYTEA")
     @Size(min = 8, max = 8)
     private byte[] firstBytes;
@@ -41,6 +42,7 @@ public class Signature {
 
     private int offsetEnd;
 
+    @Column(columnDefinition = "TEXT")
     private String digitalSignature;
 
     private LocalDateTime updatedAt;

@@ -64,7 +64,7 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSession> sessions;
 
-    @OneToMany(mappedBy = "changedByUser", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "changedBy", cascade = CascadeType.ALL)
     private List<SignatureAudit> signatureAudits;
 
     public User(String login, String passwordHash, String email, ROLE role, List<License> licenses, List<Device> devices, List<LicenseHistory> licenseHistories) {

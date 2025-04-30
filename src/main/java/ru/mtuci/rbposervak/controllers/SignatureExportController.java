@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.mtuci.rbposervak.services.SignatureExportService;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/api/signatures")
 public class SignatureExportController {

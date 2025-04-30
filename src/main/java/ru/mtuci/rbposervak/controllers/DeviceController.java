@@ -25,7 +25,7 @@ public class DeviceController {
     public ResponseEntity<?> createDevice(@Valid @RequestBody DeviceRequest deviceRequest, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
+            return ResponseEntity.status(200).body("Validation error: " + errMsg);
         }
         Device device = deviceService.createDevice(deviceRequest);
         return ResponseEntity.status(200).body(device.toString());
@@ -41,7 +41,7 @@ public class DeviceController {
     public ResponseEntity<?> updateDevice(@PathVariable Long id, @Valid @RequestBody DeviceRequest deviceRequest, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
+            return ResponseEntity.status(200).body("Validation error: " + errMsg);
         }
 
         Device device = deviceService.updateDevice(id, deviceRequest);
@@ -51,7 +51,7 @@ public class DeviceController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDevice(@PathVariable Long id){
         deviceService.deleteDevice(id);
-        return ResponseEntity.status(200).body("Устройство с id: " + id + " успешно удалено");
+        return ResponseEntity.status(200).body("Device with id: " + id + " successfully deleted.");
     }
 
     @GetMapping

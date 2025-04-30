@@ -30,7 +30,8 @@ public class SignatureHistory {
     @Column(name = "threat_name", columnDefinition = "TEXT")
     private String threatName;
 
-    @Column(name = "first_bytes", columnDefinition = "BINARY(8)")
+    // @Lob ну или блоб
+    @Column(name = "first_bytes", columnDefinition = "BYTEA")
     private byte[] firstBytes;
 
     private String remainderHash;

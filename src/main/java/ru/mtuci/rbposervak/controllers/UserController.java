@@ -23,7 +23,7 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/info/{id}")
     public ResponseEntity<?> getUserInfo(@PathVariable Long id){
-        return ResponseEntity.status(200).body("Пользователь: " + userService.getUserById(id).toString());
+        return ResponseEntity.status(200).body("User: " + userService.getUserById(id).toString());
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -40,7 +40,7 @@ public class UserController {
 
             if (user.getLogin() != null && !user.getLogin().equals(currentUser.getLogin())) {
                 if (userService.existsByLogin(user.getLogin())) {
-                    return ResponseEntity.status(400).body("Ошибка валидации: такой логин уже существует");
+                    return ResponseEntity.status(400).body("Validation error: user already exists");
                 }
 
                 currentUser.setLogin(user.getLogin());
@@ -48,7 +48,7 @@ public class UserController {
 
             if (user.getEmail() != null && !user.getEmail().equals(currentUser.getEmail())) {
                 if (userService.existsByEmail(user.getEmail())) {
-                    return ResponseEntity.status(400).body("Ошибка валидации: такая почта уже существует");
+                    return ResponseEntity.status(400).body("Validation error: email already exists");
                 }
                 currentUser.setEmail(user.getEmail());
             }
@@ -59,10 +59,10 @@ public class UserController {
 
             userService.saveUser(currentUser);
 
-            return ResponseEntity.status(200).body("Данные пользователя " + currentUser.getLogin() + " обновлены");
+            return ResponseEntity.status(200).body("User data: " + currentUser.getLogin() + " updated successfully");
 
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Внутренняя ошибка сервера: " + e.getMessage());
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
         }
     }
 
@@ -71,9 +71,9 @@ public class UserController {
     public ResponseEntity<?> deleteUser(@PathVariable Long id){
         try{
             userService.deleteUser(id);
-            return ResponseEntity.status(200).body("Пользователь с id: " + id + " удален");
+            return ResponseEntity.status(200).body("User with id: " + id + " deleted");
         } catch (Exception e){
-            return ResponseEntity.status(500).body("Внутренняя ошибка сервера: " + e.getMessage());
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
         }
     }
 }

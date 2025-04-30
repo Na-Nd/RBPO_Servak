@@ -29,7 +29,7 @@ public class ActivationController {
     public ResponseEntity<?> activateLicense(@Valid @RequestBody ActivationRequest activationRequest, BindingResult bindingResult) {
         if(bindingResult.hasErrors()){
             String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            return ResponseEntity.status(400).body("Ошибка валидации: " + errMsg);
+            return ResponseEntity.status(400).body("Validation error: " + errMsg);
         }
 
         try{
@@ -43,11 +43,11 @@ public class ActivationController {
             String userLogin = user.getLogin();
             Ticket ticket = licenseService.activateLicense(activationCode, device, userLogin);
 
-            return ResponseEntity.status(200).body("Лицензия успешно активирована: " + ticket.toString());
+            return ResponseEntity.status(200).body("License successfully activated: " + ticket.toString());
         } catch (IllegalArgumentException e){
-            return ResponseEntity.status(400).body("Ошибка валидации: " + e.getMessage());
+            return ResponseEntity.status(400).body("Validation error: " + e.getMessage());
         } catch (Exception e){
-            return ResponseEntity.status(500).body("Внутренняя ошибка сервера:" + e.getMessage());
+            return ResponseEntity.status(500).body(":" + e.getMessage());
         }
     }
 }

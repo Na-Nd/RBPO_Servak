@@ -39,18 +39,19 @@ public class AuthController {
     public ResponseEntity<?> userRegistration(@Valid @RequestBody UserRegisterDTO userDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            return ResponseEntity.badRequest().body("Ошибка валидации: " + errMsg);
+            return ResponseEntity.badRequest().body("Validation error: " + errMsg);
         }
 
         try{
             // Регистрация и создание сессии
             UserSession session = userService.registerUser(userDTO);
 
-            return ResponseEntity.status(200).body(new TokenResponse(session.getAccessToken(), session.getRefreshToken()));
+            // Рефреш возвращать не будем
+            return ResponseEntity.status(200).body(new TokenResponse(session.getAccessToken(), null));
         } catch (Exception e){
             System.out.println("Ошибка при регистрации пользователя: " + e.getMessage());
             return ResponseEntity.status(400).body(
-                    new TokenResponse(null, null, "Ошибка при регистрации: " + e.getMessage())
+                    new TokenResponse(null, null, "Registration error: " + e.getMessage())
             );
         }
     }
@@ -59,16 +60,16 @@ public class AuthController {
     public ResponseEntity<?> userLogin(@Valid @RequestBody UserLoginDTO userDTO, BindingResult bindingResult) {
         if(bindingResult.hasErrors()){
             String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
+            return ResponseEntity.status(200).body("Validation error: " + errMsg);
         }
 
         try{
             UserSession session = userService.loginUser(userDTO);
-            return ResponseEntity.status(200).body(new TokenResponse(session.getAccessToken(), session.getRefreshToken()));
+            return ResponseEntity.status(200).body(new TokenResponse(session.getAccessToken(), null));
         } catch (Exception e){
             System.out.println("Ошибка при логине пользователя: " + e.getMessage());
             return ResponseEntity.status(400).body(
-                    new TokenResponse(null, null, "Ошибка при логине: " + e.getMessage())
+                    new TokenResponse(null, null, "Login error: " + e.getMessage())
             );
         }
     }
@@ -78,10 +79,10 @@ public class AuthController {
         try{
             userService.logoutUser(authBearer);
 
-            return ResponseEntity.status(200).body("Успешный выход из системы");
+            return ResponseEntity.status(200).body("Successful logout");
         } catch (Exception e){
             System.out.println("Ошибка при выходе из системы: " + e.getMessage());
-            return ResponseEntity.status(400).body("Ошибка при выходе: " + e.getMessage());
+            return ResponseEntity.status(400).body("Error logging out: " + e.getMessage());
         }
     }
 }

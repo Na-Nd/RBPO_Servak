@@ -27,19 +27,19 @@ public class LicenseController {
     public ResponseEntity<?> createLicense(@Valid @RequestBody LicenseRequest licenseRequest, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
+            return ResponseEntity.status(200).body("Validation error: " + errMsg);
         }
 
         try{
             License license = licenseService.createLicense(licenseRequest);
 
             if(license == null){
-                return ResponseEntity.status(500).body("Внутренняя ошибка сервера: не получилось создать лицензию");
+                return ResponseEntity.status(401).body("Error creating license");
             }
 
-            return ResponseEntity.status(200).body("Создание лицензии прошло успешно. " + license.toString());
+            return ResponseEntity.status(200).body("License created successfully. " + license);
         } catch (IllegalArgumentException e){
-            return ResponseEntity.status(400).body("Ошибка валидации: " + e.getMessage());
+            return ResponseEntity.status(400).body("Validation error: " + e.getMessage());
         }
     }
 }

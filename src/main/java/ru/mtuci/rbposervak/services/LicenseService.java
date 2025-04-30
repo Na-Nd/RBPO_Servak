@@ -73,12 +73,12 @@ public class LicenseService{
 
         License license = licenseRepository.getLicensesByCode(activationCode);
         if(license == null){
-            throw new IllegalArgumentException("Лицензия не найдена");
+            throw new IllegalArgumentException("License not found");
         }
 
         User user = userService.findUserByLogin(login);
         if(user == null){
-            throw new IllegalArgumentException("Пользователь не найден");
+            throw new IllegalArgumentException("User not found");
         }
 
         // Если валидно
@@ -86,7 +86,7 @@ public class LicenseService{
 
         // То обновляем
         if(license.getFirstActivationDate() == null){
-            updateLicenseForActivation(license, user); // TODO: 2 добавлена замена id владельца лицензии
+            updateLicenseForActivation(license, user);
         }
 
         // То создать связь
@@ -129,21 +129,21 @@ public class LicenseService{
 
         // Проверка на заблокированность
         if (license.getIsBlocked()) {
-            throw new IllegalArgumentException("Лицензия заблокирована");
+            throw new IllegalArgumentException("License is blocked");
         }
 
         // Проверка на активацию
         if (license.getFirstActivationDate() == null) {
-            throw new IllegalArgumentException("Лицензия не активирована");
+            throw new IllegalArgumentException("License is not active");
         }
 
         // Проверка остатка времени до конца лицензии
         long currentTimeMillis = System.currentTimeMillis();
         long remainingTimeMillis = license.getEndingDate().getTime() - currentTimeMillis;
 
-        // TODO чтобы нельзя было накручивать себе активации
+        // Чтобы нельзя было накручивать себе активации
         if (remainingTimeMillis > 1 * 60 * 60 * 1000) { // 1 час в миллисекундах
-            throw new IllegalArgumentException("Лицензию нельзя обновить: до истечения срока лицензии осталось более 1 часа");
+            throw new IllegalArgumentException("License cannot be renewed: more than 1 hour left before license expiration");
         }
 
         // Обновление срока действия лицензии
@@ -175,35 +175,29 @@ public class LicenseService{
     }
 
     private void validateActivation(License license, Device device, String login) {
-        //        System.out.println("Ожидаемый пользователь для лицухи: " + license.getUser().getId() + "\n" + "Пользователь активирует с id:" + user.getId());
-        //        if(!(license.getUser().getId().equals(user.getId()))){
-        //            throw new IllegalArgumentException("Неправильный пользователь");
-        //        }
-
         User user = userService.findUserByLogin(login);
-        // Верхняя проверка не имеет смысла так как: для того чтобы два юзера активировали одно лицензию нужен список из юзеров в столбце user_id,
-        // и еще если сравнивать владельца с юзером из столбца user_id то от верхнех проверки нет смысла
+
         if(license.getUser() != null){ // И теперь спереть лицуху не получится
             if(!(license.getUser().getId().equals(user.getId()))){
-                throw new IllegalArgumentException("Неправильный пользователь"); // TODO Лицензия уже активирована (это для клиента)
+                throw new IllegalArgumentException("Invalid user");
             }
         }
 
         // Заблокирована
         if (license.getIsBlocked()) {
-            throw new IllegalArgumentException("Нельзя активировать лицензию: лицензия заблокирована");
+            throw new IllegalArgumentException("Unable to activate license: license is blocked");
         }
 
         // Истекла
         if(license.getEndingDate() != null) {
             if (license.getEndingDate().before(new Date())) {
-                throw new IllegalArgumentException("Нельзя активировать лицензию: лицензия истекла");
+                throw new IllegalArgumentException("Unable to activate license: license has expired");
             }
         }
 
         // Если девайсов больше
         if (license.getDevicesCount() <= deviceLicenseService.getDeviceLicensesByLicense(license).size()) {
-            throw new IllegalArgumentException("Нельзя активировать лицензию: кол-во устройств превышено");
+            throw new IllegalArgumentException("License cannot be activated: number of devices exceeded");
         }
     }
 
@@ -231,7 +225,7 @@ public class LicenseService{
             byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Ошибка генерации подписи", e);
+            throw new RuntimeException("Signature generation error", e);
         }
     }
 
@@ -242,7 +236,7 @@ public class LicenseService{
             byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Ошибка генерации кода лицензии", e);
+            throw new RuntimeException("License code generation error", e);
         }
     }
 }

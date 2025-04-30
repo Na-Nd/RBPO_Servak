@@ -47,7 +47,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 } else {
                     // Если что-то не получилось, завершаем запрос с ошибкий
                     System.out.println("Токен обновить не удалось");
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Токен истек и не может быть обновлен");
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "The token has expired and cannot be renewed.");
                     return;
                 }
             }
@@ -68,7 +68,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                    System.out.println("Пользователь в фильтре: " + username + ", роль: " + role);
+                    System.out.println("User in filter: " + username + ", role: " + role);
                 }
             } else {
                 System.out.println("Токен не прошел валидацию");

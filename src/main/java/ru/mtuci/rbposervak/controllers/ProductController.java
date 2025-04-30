@@ -25,7 +25,7 @@ public class ProductController {
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductRequest productRequest, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
+            return ResponseEntity.status(200).body("Validation error: " + errMsg);
         }
 
         Product product = productService.createProduct(productRequest);
@@ -36,7 +36,7 @@ public class ProductController {
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody ProductRequest productRequest, BindingResult bindingResult) {
         if(bindingResult.hasErrors()){
             String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
+            return ResponseEntity.status(200).body("Validation error: " + errMsg);
         }
 
         Product product = productService.updateProduct(id, productRequest);
@@ -46,7 +46,7 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id){
         productService.deleteProduct(id);
-        return ResponseEntity.status(200).body("Продукт с id: " + id + " удален");
+        return ResponseEntity.status(200).body("Product with id: " + id + " successfully deleted");
     }
 
     @GetMapping

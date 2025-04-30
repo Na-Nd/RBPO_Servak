@@ -27,7 +27,7 @@ public class LicenseHistoryController {
         try{
             return ResponseEntity.status(200).body(licenseHistoryService.getLicenseHistoryById(id));
         } catch (Exception e){
-            return ResponseEntity.status(404).body("История с id: " + id + " не найдена");
+            return ResponseEntity.status(404).body("History with id: " + id + " not found.");
         }
     }
 
@@ -35,9 +35,9 @@ public class LicenseHistoryController {
     public ResponseEntity<String> deleteLicenseHistoryById(@PathVariable Long id){
         try{
             licenseHistoryService.deleteLicenseHistoryById(id);
-            return ResponseEntity.status(200).body("История с id: " + id + " удалена");
+            return ResponseEntity.status(200).body("History with id: " + id + " deleted");
         } catch (Exception e){
-            return ResponseEntity.status(404).body("История с id: " + id + " не найдена");
+            return ResponseEntity.status(404).body("History with id: " + id + " not found.");
         }
     }
 }

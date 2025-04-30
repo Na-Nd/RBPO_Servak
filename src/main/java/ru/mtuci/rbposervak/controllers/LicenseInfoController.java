@@ -34,32 +34,31 @@ public class LicenseInfoController {
     public ResponseEntity<?> getLicenseInfo(@Valid @RequestBody LicenseInfoRequest licenseInfoRequest, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
+            return ResponseEntity.status(200).body("Validation error: " + errMsg);
         }
 
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User user = userService.findUserByLogin(authentication.getName());
 
-            //Device device = deviceService.getDeviceByInfo(licenseInfoRequest.getMacAddress(), user);
             Device device = deviceService.getDeviceByMacAddress(licenseInfoRequest.getMacAddress());
 
             if(!Objects.equals(device.getUser().getId(), user.getId())){
-                throw new IllegalArgumentException("Ошибка аутентификации: неверный пользователь");
+                throw new IllegalArgumentException("Authentication error: invalid user");
             }
 
             if(device == null){
-                return ResponseEntity.status(404).body("Ошибка: устройство не найдено");
+                return ResponseEntity.status(404).body("Error: device not found");
             }
 
             License activeLicense = licenseService.getActiveLicenseForDevice(device, user, licenseInfoRequest.getLicenseCode());
 
             Ticket ticket = licenseService.generateTicket(activeLicense, device);
 
-            return ResponseEntity.status(200).body("Лицензия найдена, Тикет: " + ticket.toString());
+            return ResponseEntity.status(200).body("License found, Ticket: " + ticket.toString());
 
         } catch (Exception e){
-            return ResponseEntity.status(500).body("Внутренняя ошибка сервера: " + e.getMessage());
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
         }
     }
 

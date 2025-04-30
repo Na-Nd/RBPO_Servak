@@ -66,10 +66,10 @@ public class UserService implements UserDetailsService {
     public UserSession registerUser(UserRegisterDTO userDTO) {
         // Существует ли пользователь с такой почтой или именем
         if(userRepository.findUserByEmail(userDTO.getEmail()).isPresent()){
-            throw new RuntimeException("Пользователь с такой почтой уже существует");
+            throw new RuntimeException("User with this email already exists");
         }
         if (userRepository.findUserByLogin(userDTO.getLogin()).isPresent()){
-            throw new RuntimeException("Пользователь с таким username уже существует");
+            throw new RuntimeException("User with this login already exists");
         }
 
         User user = User.builder()
@@ -89,11 +89,11 @@ public class UserService implements UserDetailsService {
     /// Логин
     public UserSession loginUser(UserLoginDTO userDTO){
         User user = userRepository.findUserByLogin(userDTO.getLogin())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Проверка пароля
         if (!passwordEncoder.matches(userDTO.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Неверный пароль");
+            throw new RuntimeException("Incorrect password");
         }
 
         // Если пользователь найден и пароль совпал
@@ -106,7 +106,7 @@ public class UserService implements UserDetailsService {
             userSessionService.deactivateSessionByAccessToken(jwtUtil.resolveToken(authBearer));
             System.out.println("Пользователь вышел из системы");
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при выходе из системы: " + e.getMessage());
+            throw new RuntimeException("Logout error: " + e.getMessage());
         }
     }
 

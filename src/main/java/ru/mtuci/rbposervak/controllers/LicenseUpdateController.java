@@ -27,7 +27,7 @@ public class LicenseUpdateController {
     public ResponseEntity<?> update(@Valid @RequestBody LicenseUpdateRequest licenseUpdateRequest, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
+            return ResponseEntity.status(200).body("Validation error: " + errMsg);
         }
 
         try{
@@ -37,7 +37,7 @@ public class LicenseUpdateController {
                     licenseUpdateRequest.getMacAddress()
             );
 
-            return ResponseEntity.status(200).body("Успешное обновление лицензии, тикет: " + ticket.toString());
+            return ResponseEntity.status(200).body("Successful license update, ticket: " + ticket.toString());
         } catch (IllegalArgumentException e){
             return ResponseEntity.status(400).body(e.getMessage());
         }

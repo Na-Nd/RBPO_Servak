@@ -10,7 +10,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -18,9 +18,9 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
   access-jwt:
-    expiration: ${ACCESS_JWT_EXPIRATION}  # например, 3600000 (1 час)
+    expiration: ${ACCESS_JWT_EXPIRATION}
   refresh-jwt:
-    expiration: ${REFRESH_JWT_EXPIRATION} # например, 2592000000 (30 дней)
+    expiration: ${REFRESH_JWT_EXPIRATION}
 
 server:
   http2:

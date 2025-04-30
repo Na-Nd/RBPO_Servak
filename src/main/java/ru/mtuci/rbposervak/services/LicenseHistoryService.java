@@ -23,7 +23,7 @@ public class LicenseHistoryService {
 
     public LicenseHistory getLicenseHistoryById(Long id) {
         return licenseHistoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Запись с id " + id + " не найдена"));
+                .orElseThrow(() -> new RuntimeException("History with id " + id + " not found"));
     }
 
     public void deleteLicenseHistoryById(Long id) {

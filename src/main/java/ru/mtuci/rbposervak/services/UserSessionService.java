@@ -34,19 +34,19 @@
         public UserSession createUserSession(User user) {
             // Проверка на наличие заблокированных сессий
             if(hasBlockedSessions(user)){
-                throw new RuntimeException("Сессии пользователя заблокированы");
+                throw new RuntimeException("User sessions are blocked");
             }
     
             // Проверка на блокировку аккаунта
             if(user.getIsBlocked()){
-                throw new RuntimeException("Аккаунт пользователя заблокирован");
+                throw new RuntimeException("The user's account has been blocked.");
             }
     
             // Проверка на активные сессии
             List<UserSession> activeSessions = userSessionRepository.findByUserAndStatus(user, STATUS.ACTIVE);
             if (!activeSessions.isEmpty()) {
                 blockUserSessions(user);
-                throw new RuntimeException("Обнаружено несколько активных сессий. Все сессии заблокированы.");
+                throw new RuntimeException("Multiple active sessions detected. All sessions blocked.");
             }
     
             UserSession session = UserSession.builder()
@@ -73,22 +73,22 @@
         public UserSession refreshAccessToken(String refreshToken) {
             // Проверка на наличие активной сессии
             UserSession session = userSessionRepository.findByRefreshToken(refreshToken)
-                    .orElseThrow(() -> new RuntimeException("Сессия не найдена"));
+                    .orElseThrow(() -> new RuntimeException("Session not found"));
     
             if (session.getStatus() != STATUS.ACTIVE) {
-                throw new RuntimeException("Сессия не активна");
+                throw new RuntimeException("Session is not active");
             }
     
             // Проверка на наличие заблокированных сессий
             if (hasBlockedSessions(session.getUser())) {
-                throw new RuntimeException("Невозможно обновить access токен: есть заблокированные сессии");
+                throw new RuntimeException("Unable to refresh access token: there are blocked sessions");
             }
     
             // Проверка на активные сессии
             List<UserSession> activeSessions = userSessionRepository.findByUserAndStatus(session.getUser(), STATUS.ACTIVE);
             if (activeSessions.size() > 1) { // Если больше одной - это подозрительная активность, соответственно блокируем
                 blockUserSessions(session.getUser());
-                throw new RuntimeException("Обнаружено несколько активных сессий. Все сессии заблокированы.");
+                throw new RuntimeException("Multiple active sessions detected. All sessions blocked.");
             }
     
             // Проверка истечения refresh токена
@@ -110,17 +110,17 @@
         public UserSession refreshRefreshToken(String refreshToken){
             // Проверка на наличие активной сессии
             UserSession session = userSessionRepository.findByRefreshToken(refreshToken)
-                    .orElseThrow(() -> new RuntimeException("Сессия не найдена"));
+                    .orElseThrow(() -> new RuntimeException("Session not found"));
     
             if(session.getStatus() != STATUS.ACTIVE){
-                throw new RuntimeException("Сессия не активна");
+                throw new RuntimeException("Session is not active");
             }
     
             // Проверка на активные сессии
             List<UserSession> activeSessions = userSessionRepository.findByUserAndStatus(session.getUser(), STATUS.ACTIVE);
             if (activeSessions.size() > 1) {
                 blockUserSessions(session.getUser());
-                throw new RuntimeException("Обнаружено несколько активных сессий. Все сессии заблокированы.");
+                throw new RuntimeException("Multiple active sessions detected. All sessions blocked.");
             }
     
             // В случае если сессия активна и нет подозрительной активности, обновим refresh токен текущей сессии (нет надобности создавать новую сессию)
@@ -142,11 +142,11 @@
         /// Деактивация сессии по access токену
         public void deactivateSessionByAccessToken(String accessToken) {
             UserSession session = userSessionRepository.findByAccessToken(accessToken)
-                    .orElseThrow(() -> new RuntimeException("Сессия не найдена"));
+                    .orElseThrow(() -> new RuntimeException("Session not found"));
     
             // Лишний раз проверяем на активность
             if (session.getStatus() != STATUS.ACTIVE) {
-                throw new RuntimeException("Сессия уже неактивна");
+                throw new RuntimeException("The session is no longer active");
             }
     
             session.setStatus(STATUS.INACTIVE);
@@ -158,7 +158,7 @@
         /// Поиск сессии по access токену
         public UserSession getSessionByAccessToken(String accessToken) {
             return userSessionRepository.findByAccessToken(accessToken)
-                    .orElseThrow(() -> new RuntimeException("Сессия не найдена"));
+                    .orElseThrow(() -> new RuntimeException("Session not found"));
         }
     
         /// Обновление времени последней активности для активной сессии пользователя
@@ -167,7 +167,7 @@
             List<UserSession> activeSessions = userSessionRepository.findByUserAndStatus(user, STATUS.ACTIVE);
     
             if (activeSessions.isEmpty()) {
-                throw new RuntimeException("Активная сессия не найдена");
+                throw new RuntimeException("Active session not found");
             }
     
             UserSession session = activeSessions.getFirst();
@@ -185,7 +185,7 @@
     
             // Ищем сессию по токену
             UserSession session = userSessionRepository.findByAccessToken(accessToken)
-                    .orElseThrow(() -> new RuntimeException("Сессия не найдена"));
+                    .orElseThrow(() -> new RuntimeException("Session not found"));
     
             // Проверяем статус
             boolean isActive = session.getStatus() == STATUS.ACTIVE;

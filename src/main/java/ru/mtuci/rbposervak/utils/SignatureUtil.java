@@ -40,7 +40,7 @@ public class SignatureUtil {
             byte[] digitalSignature = signData(hash);
             signature.setDigitalSignature(Base64.getEncoder().encodeToString(digitalSignature));
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при подписании сигнатуры: " + e.getMessage());
+            throw new RuntimeException("Error signing signature: " + e.getMessage());
         }
     }
 
@@ -57,7 +57,7 @@ public class SignatureUtil {
             sig.update(hash);
             return sig.verify(signatureBytes);
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при проверке подписи", e);
+            throw new RuntimeException("Error verifying signature", e);
         }
     }
 

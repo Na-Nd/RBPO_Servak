@@ -25,7 +25,7 @@ public class LicenseTypeController {
     public ResponseEntity<?> createLicenseType(@Valid @RequestBody LicenseTypeRequest licenseTypeRequest, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
+            return ResponseEntity.status(200).body("Validation error: " + errMsg);
         }
 
         LicenseType licenseType = licenseTypeService.createLicenseType(licenseTypeRequest);
@@ -41,7 +41,7 @@ public class LicenseTypeController {
     public ResponseEntity<?> updateLicenseType(@PathVariable Long id, @Valid @RequestBody LicenseTypeRequest licenseTypeRequest, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             String errMsg = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            return ResponseEntity.status(200).body("Ошибка валидации: " + errMsg);
+            return ResponseEntity.status(200).body("Validation error: " + errMsg);
         }
 
         LicenseType licenseType = licenseTypeService.updateLicenseType(id, licenseTypeRequest);
@@ -51,7 +51,7 @@ public class LicenseTypeController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteLicenseTypeById(@PathVariable Long id){
         licenseTypeService.deleteLicenseType(id);
-        return ResponseEntity.status(200).body("Тип лицензии с id: " + id + " удален");
+        return ResponseEntity.status(200).body("License type with id: " + id + " deleted");
     }
 
     @GetMapping

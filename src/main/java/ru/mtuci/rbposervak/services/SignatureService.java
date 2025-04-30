@@ -39,7 +39,7 @@ public class SignatureService {
         signature.setStatus(STATUS.ACTUAL);
         signatureUtil.signSignature(signature);
         Signature saved = signatureRepository.save(signature);
-        logAudit(saved, createdBy, ChangeType.CREATED, "Создана новая сигнатура");
+        logAudit(saved, createdBy, ChangeType.CREATED, "New signature created");
         return saved;
     }
 
@@ -70,7 +70,7 @@ public class SignatureService {
                     logAudit(saved, changedBy, ChangeType.UPDATED, signatureUtil.getChangedFields(existing, updatedSignature));
 
                     return saved;
-                }).orElseThrow(() -> new RuntimeException("Сигнатура не найдена"));
+                }).orElseThrow(() -> new RuntimeException("Signature not found"));
     }
 
     /// Сохранение старой сигнатуры
@@ -113,7 +113,7 @@ public class SignatureService {
     public List<Signature> getAllActualSignatures() {
         List<Signature> signatures = signatureRepository.findAllActual();
         if(signatures.isEmpty()) {
-            throw new RuntimeException("Актуальные сигнатуры не найдены");
+            throw new RuntimeException("Actual signatures not found");
         }
         return signatures;
     }
@@ -122,7 +122,7 @@ public class SignatureService {
     public List<Signature> getSignaturesByIds(List<UUID> ids) {
         List<Signature> signatures = signatureRepository.findByIdIn(ids);
         if(signatures.isEmpty()) {
-            throw new RuntimeException("Сигнатуры с идентификаторами: " + ids + " не найдены");
+            throw new RuntimeException("Signatures with ids: " + ids + " not found");
         }
         return signatures;
     }
@@ -130,7 +130,7 @@ public class SignatureService {
     /// Удаление (смена статуса) сигнатуры
     public void deleteSignature(UUID id, String deletedBy) {
         Signature signature = signatureRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Сигнатура не найдена"));
+                .orElseThrow(() -> new RuntimeException("Signature not found"));
 
         deletedBy = deletedBy.substring(7);
         Long adminId = userService.findUserByLogin(deletedBy).getId();
@@ -142,7 +142,7 @@ public class SignatureService {
         signature.setUpdatedAt(LocalDateTime.now());
         signatureRepository.save(signature);
 
-        logAudit(signature, adminId, ChangeType.DELETED, "Сигнатура помечена как удаленная");
+        logAudit(signature, adminId, ChangeType.DELETED, "Signature marked as deleted");
     }
 
     /// Получение конкретной сигнатуры
@@ -154,7 +154,7 @@ public class SignatureService {
     public List<Signature> getSignaturesModifiedAfter(LocalDateTime date) {
         List<Signature> signatures = signatureRepository.findByUpdatedAtAfter(date);
         if(signatures.isEmpty()) {
-            throw new RuntimeException("Изменения после даты: " + date + " не найдены");
+            throw new RuntimeException("Changes after date: " + date + " not found");
         }
         return signatures;
     }
@@ -162,14 +162,14 @@ public class SignatureService {
     /// Пометка как CORRUPTED
     public void markAsCorrupted(UUID id, String reason) {
         Signature signature = signatureRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Сигнатура не найдена"));
+                .orElseThrow(() -> new RuntimeException("Signature not found"));
 
         saveToHistory(signature);
         signature.setStatus(STATUS.CORRUPTED);
         signature.setUpdatedAt(LocalDateTime.now());
         signatureRepository.save(signature);
 
-        logAudit(signature, null, ChangeType.CORRUPTED, "Сигнатура помечена как CORRUPTED: " + reason);
+        logAudit(signature, null, ChangeType.CORRUPTED, "Signature marked as CORRUPTED: " + reason);
     }
 
     /// Периодическая проверка ЭЦП
@@ -181,7 +181,7 @@ public class SignatureService {
 
         signaturesToCheck.forEach(signature -> {
             if (!signatureUtil.verifySignature(signature)) {
-                markAsCorrupted(signature.getId(), "Ошибка проверки эцп сигнатуры: " + signature.getId());
+                markAsCorrupted(signature.getId(), "Error checking digital signature: " + signature.getId()); // ошибка проверки подписи
             }
         });
     }
@@ -189,7 +189,7 @@ public class SignatureService {
     /// Получение записей по статусу
     public List<Signature> getSignaturesByStatus(STATUS status) {
         return signatureRepository.findByStatus(status)
-                .orElseThrow(() -> new RuntimeException("Записи со статусом " + status.toString() + " не найдены"));
+                .orElseThrow(() -> new RuntimeException("Signatures with status " + status.toString() + " not found"));
     }
 
     /// Получение аудита по сигнатуре

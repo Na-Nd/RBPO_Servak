@@ -89,7 +89,7 @@ public class SignatureController {
     public ResponseEntity<String> deleteSignature(@PathVariable UUID id, @RequestHeader("Authorization") String authBearer) {
         try{
             signatureService.deleteSignature(id, authBearer);
-            return ResponseEntity.status(200).body("Успешное удаление сигнатуры");
+            return ResponseEntity.status(200).body("Signature deleted successfully");
         } catch (RuntimeException e){
             return ResponseEntity.status(400).body(e.getMessage());
         }
@@ -122,9 +122,9 @@ public class SignatureController {
         }
 
         if (!signatureUtil.verifySignature(signature)) {
-            signatureService.markAsCorrupted(id, "Ошибка верификации");
-            return ResponseEntity.status(200).body("Сигнатура невалидна, помечена как  CORRUPTED.");
+            signatureService.markAsCorrupted(id, "Validation error");
+            return ResponseEntity.status(200).body("The signature is invalid, marked as CORRUPTED.");
         }
-        return ResponseEntity.status(200).body("Сигнатура валидна");
+        return ResponseEntity.status(200).body("Signature is valid");
     }
 }
