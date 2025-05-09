@@ -11,6 +11,7 @@ import ru.mtuci.rbposervak.utils.SignatureExportUtil;
 
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class SignatureExportService {
@@ -23,22 +24,37 @@ public class SignatureExportService {
         this.signatureExportUtil = signatureExportUtil;
     }
 
+    /// Экспорт всех сигнатрур
     public MultipartFile exportSignatures() throws Exception {
         List<Signature> actualSignatures = signatureRepository.findByStatus(STATUS.ACTUAL)
-                .orElseThrow(() -> new RuntimeException("Актуальные сигнатуры не найдены"));
+                .orElseThrow(() -> new RuntimeException("Actual signatures not found"));
 
-        // Формируем манифест
-        byte[] manifestBytes = signatureExportUtil.createManifest(actualSignatures);
+        return exportFile(actualSignatures);
+    }
 
-        // Бинари сигнатур
-        byte[] signaturesBytes = signatureExportUtil.createSignaturesBinary(actualSignatures);
+    /// Экспорт по списку идшников
+    public MultipartFile exportSignaturesByIds(List<UUID> ids) throws Exception {
+        List<Signature> signatures = signatureRepository.findActualByIds(ids);
 
-        // Экспорт (кладем манифест, бинари, уникальное имя)
+        if(signatures.isEmpty()) {
+            throw new RuntimeException("Actual signatures not found");
+        }
+
+        return exportFile(signatures);
+    }
+
+    /// Создание самого экспорта
+    private MultipartFile exportFile(List<Signature> signatures) throws Exception {
+        byte[] manifestBytes = signatureExportUtil.createManifest(signatures); // манифест
+        byte[] signaturesBytes = signatureExportUtil.createSignaturesBinary(signatures); // бинари сигнатур
+
+        // Экспорт
         return new SignatureExportFile(
                 manifestBytes,
                 signaturesBytes,
-                "signatures_export_" + System.currentTimeMillis() + ".dat" // Или UUID
+                "signature_export_" + System.currentTimeMillis() + ".dat"
         );
     }
+
 
 }

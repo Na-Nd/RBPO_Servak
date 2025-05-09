@@ -27,13 +27,14 @@ public class SignatureHistory {
     @Column(name = "version_created_at")
     private LocalDateTime versionCreatedAt;
 
-    @Column(name = "threat_name", columnDefinition = "TEXT")
+    @Column(name = "threat_name", columnDefinition = "TEXT") // Одно из строковых полей слишком короткое почему-то
     private String threatName;
 
-    // @Lob ну или блоб
+    // @Lob ну или блоб в columnDefinition
     @Column(name = "first_bytes", columnDefinition = "BYTEA")
     private byte[] firstBytes;
 
+    @Column(columnDefinition = "TEXT") // Одно из строковых полей слишком короткое почему-то
     private String remainderHash;
 
     private int remainderLength;
@@ -44,6 +45,7 @@ public class SignatureHistory {
 
     private int offsetEnd;
 
+    @Column(columnDefinition = "TEXT") // Одно из строковых полей слишком короткое почему-то
     private String digitalSignature;
 
     @Column(name = "updated_at")

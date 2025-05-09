@@ -175,12 +175,14 @@ public class SignatureService {
     /// Периодическая проверка ЭЦП
     @Scheduled(fixedRate = VERIFICATION_INTERVAL_HOURS * 60 * 60 * 1000)
     public void verifySignaturesPeriodically() {
+        System.out.println("Запуск проверки ЭЦП");
         LocalDateTime lastCheckTime = LocalDateTime.now().minusHours(VERIFICATION_INTERVAL_HOURS);
         List<Signature> signaturesToCheck = signatureRepository
                 .findByUpdatedAtAfterAndStatus(lastCheckTime, STATUS.ACTUAL);
 
         signaturesToCheck.forEach(signature -> {
             if (!signatureUtil.verifySignature(signature)) {
+                System.out.printf("Сигнатура %s не прошла проверку подписи \n", signature.getThreatName());
                 markAsCorrupted(signature.getId(), "Error checking digital signature: " + signature.getId()); // ошибка проверки подписи
             }
         });

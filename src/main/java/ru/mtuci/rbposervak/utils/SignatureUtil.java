@@ -48,15 +48,20 @@ public class SignatureUtil {
     public boolean verifySignature(Signature signature) {
         try {
             String dataToVerify = buildSignableData(signature);
+            System.out.println("Data for verification: " + dataToVerify); // Логируем данные
+
             byte[] hash = calculateHash(dataToVerify);
             byte[] signatureBytes = Base64.getDecoder().decode(signature.getDigitalSignature());
 
-            // Используем сигнатуру из java.security.Signature для подписания (полное имя класса чтоб не путалось)
             java.security.Signature sig = java.security.Signature.getInstance("SHA256withRSA");
             sig.initVerify(publicKey);
             sig.update(hash);
-            return sig.verify(signatureBytes);
+            boolean isValid = sig.verify(signatureBytes);
+
+            System.out.println("Signature verification result: " + isValid); // Логируем результат
+            return isValid;
         } catch (Exception e) {
+            System.out.println("Verification error: " + e.getMessage()); // Логируем ошибку
             throw new RuntimeException("Error verifying signature", e);
         }
     }
@@ -162,8 +167,7 @@ public class SignatureUtil {
                 String.valueOf(signature.getRemainderLength()),
                 signature.getFileType(),
                 String.valueOf(signature.getOffsetStart()),
-                String.valueOf(signature.getOffsetEnd()),
-                signature.getUpdatedAt().toString());
+                String.valueOf(signature.getOffsetEnd()));
     }
 
     /// Вычисление хэша

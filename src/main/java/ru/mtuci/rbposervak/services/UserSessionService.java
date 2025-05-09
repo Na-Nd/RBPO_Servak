@@ -70,9 +70,9 @@
         }
     
         /// Обновление access токена
-        public UserSession refreshAccessToken(String refreshToken) {
+        public UserSession refreshAccessToken(String oldAccessToken) {
             // Проверка на наличие активной сессии
-            UserSession session = userSessionRepository.findByRefreshToken(refreshToken)
+            UserSession session = userSessionRepository.findByAccessToken(oldAccessToken)
                     .orElseThrow(() -> new RuntimeException("Session not found"));
     
             if (session.getStatus() != STATUS.ACTIVE) {
@@ -196,5 +196,68 @@
             }
     
             return isActive;
+        }
+
+        /// Поиск неактивный и помеченных на удаление сессий
+        public void handleInactiveSessions() {
+            LocalDateTime threshold = LocalDateTime.now().minusHours(2);
+            List<UserSession> activeSessions = userSessionRepository.findByStatusAndLastActivityTimeBefore(STATUS.ACTIVE, threshold);
+
+            if (!activeSessions.isEmpty()) {
+                System.out.printf("Найдено %s активных сессий для перевода в статус INACTIVE", activeSessions.size());
+
+                activeSessions.forEach(session -> {
+                    session.setStatus(STATUS.INACTIVE);
+                    session.setLastActivityTime(LocalDateTime.now()); // По это сути имитация логаута пользователя, поэтому установим LAT
+                });
+
+                userSessionRepository.saveAll(activeSessions);
+                System.out.println("Активные сессии успешно переведены в статус INACTIVE");
+            } else {
+                System.out.println("Активных сессий для перевода в статус INACTIVE не найдено");
+            }
+        }
+
+        /// Обработка INACTIVE и REVOKED сессий
+        public void handlingInactiveAndRevokedSessions(){
+            markSessionsAsRevoked();
+            deleteRevokedSessions();
+        }
+
+        /// Пометка неактивных сессий на отзыв
+        public void markSessionsAsRevoked() {
+            // Порог - 1 День
+            LocalDateTime threshold = LocalDateTime.now().minusDays(1);
+
+            List<UserSession> inactiveSessions = userSessionRepository.findByStatusAndLastActivityTimeBefore(STATUS.INACTIVE, threshold);
+
+            if(!inactiveSessions.isEmpty()){
+                System.out.printf("Найдено %s неактивных сессий для пометки на отзыв", inactiveSessions.size());
+
+                inactiveSessions.forEach(session -> {
+                    session.setStatus(STATUS.REVOKED);
+                    session.setLastActivityTime(LocalDateTime.now());
+                });
+
+                userSessionRepository.saveAll(inactiveSessions);
+                System.out.printf("%s сессий были помечены как REVOKED", inactiveSessions.size());
+            } else {
+                System.out.println("Неактивных сессий для пометки на отзыв не найдено");
+            }
+        }
+
+        /// Удаление сессий, помеченных на отзыв (чтобы не хранились долго)
+        public void deleteRevokedSessions(){
+            LocalDateTime threshold = LocalDateTime.now().minusDays(1);
+
+            List<UserSession> revokedSessions = userSessionRepository.findByStatusAndLastActivityTimeBefore(STATUS.REVOKED, threshold);
+
+            if(!revokedSessions.isEmpty()){
+                System.out.printf("Найдено %s сессий для удаления", revokedSessions.size());
+                userSessionRepository.deleteAll(revokedSessions);
+                System.out.printf("%s сессий было удалено", revokedSessions.size());
+            } else {
+                System.out.println("Сессий для удаления не найдено");
+            }
         }
     }

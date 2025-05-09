@@ -1,5 +1,6 @@
 package ru.mtuci.rbposervak.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.mtuci.rbposervak.entities.ENUMS.signature.ChangeType;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"signature"})
 public class SignatureAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

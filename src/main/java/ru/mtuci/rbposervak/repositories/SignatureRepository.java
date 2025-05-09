@@ -2,6 +2,7 @@ package ru.mtuci.rbposervak.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.mtuci.rbposervak.entities.Signature;
 import ru.mtuci.rbposervak.entities.ENUMS.signature.STATUS;
@@ -19,6 +20,9 @@ public interface SignatureRepository extends JpaRepository<Signature, UUID> {
     /// Поиск актуальных
     @Query("SELECT s FROM Signature s WHERE s.status = 'ACTUAL'")
     List<Signature> findAllActual();
+
+    @Query("SELECT s FROM Signature s WHERE s.id IN :ids AND s.status = 'ACTUAL'")
+    List<Signature> findActualByIds(@Param("ids") List<UUID> ids);
 
     List<Signature> findByIdIn(List<UUID> ids);
 

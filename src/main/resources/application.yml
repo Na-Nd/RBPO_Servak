@@ -22,6 +22,11 @@ jwt:
   refresh-jwt:
     expiration: ${REFRESH_JWT_EXPIRATION}
 
+security:
+  rsa:
+    private-key: ${PRIVATE_KEY}
+    public-key: ${PUBLIC_KEY}
+
 server:
   http2:
     enabled: true

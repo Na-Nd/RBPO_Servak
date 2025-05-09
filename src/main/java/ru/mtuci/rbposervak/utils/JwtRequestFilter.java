@@ -80,4 +80,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
+//    /// Тест
+//    @Override
+//    protected boolean shouldNotFilter(HttpServletRequest request) {
+//        System.out.println("Скип эндпоинта");
+//        return request.getRequestURI().startsWith("/auth/");
+//    }
 }

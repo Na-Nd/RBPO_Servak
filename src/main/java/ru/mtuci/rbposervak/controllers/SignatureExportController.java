@@ -7,10 +7,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.mtuci.rbposervak.services.SignatureExportService;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/signatures")
@@ -26,6 +30,17 @@ public class SignatureExportController {
     public ResponseEntity<Resource> exportSignatures() throws Exception {
         MultipartFile file = signatureExportService.exportSignatures();
 
+        return ResponseEntity.status(200)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + file.getOriginalFilename() + "\"")
+                .contentType(MediaType.parseMediaType(file.getContentType()))
+                .contentLength(file.getSize())
+                .body(new ByteArrayResource(file.getBytes()));
+    }
+
+    @GetMapping(value = "/export/by-ids", produces = "multipart/mixed")
+    public ResponseEntity<Resource> exportSignaturesByIds(@RequestBody List<UUID> ids) throws Exception {
+        MultipartFile file = signatureExportService.exportSignaturesByIds(ids);
         return ResponseEntity.status(200)
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + file.getOriginalFilename() + "\"")

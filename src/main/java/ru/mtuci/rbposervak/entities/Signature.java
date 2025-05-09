@@ -1,6 +1,7 @@
 package ru.mtuci.rbposervak.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonIgnoreProperties({"auditRecords", "historyVersions"})
 public class Signature {
 
     @Id
