@@ -58,4 +58,7 @@ public class Signature {
     @OneToMany(mappedBy = "signature", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SignatureAudit> auditRecords;
 
+    @Version
+    @Column(name = "version")
+    private Long version;
 }

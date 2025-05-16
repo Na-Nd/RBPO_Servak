@@ -1,6 +1,7 @@
 package ru.mtuci.rbposervak.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.mtuci.rbposervak.entities.*;
 import ru.mtuci.rbposervak.entities.requests.LicenseRequest;
@@ -202,12 +203,17 @@ public class LicenseService{
     }
 
     private void createDeviceLicense(License license, Device device) {
-        DeviceLicense deviceLicense = new DeviceLicense();
-        deviceLicense.setDevice(device);
-        deviceLicense.setLicense(license);
-        deviceLicense.setActivationDate(new Date());
+        try{
+            DeviceLicense deviceLicense = new DeviceLicense();
+            deviceLicense.setDevice(device);
+            deviceLicense.setLicense(license);
+            deviceLicense.setActivationDate(new Date());
 
-        deviceLicenseService.save(deviceLicense);
+            deviceLicenseService.save(deviceLicense);
+        } catch (DataIntegrityViolationException e) {
+            System.out.println("Найден дубликат: устройство уже связано с лицензией");
+        }
+
     }
 
     private void updateLicenseForActivation(License license, User user) {

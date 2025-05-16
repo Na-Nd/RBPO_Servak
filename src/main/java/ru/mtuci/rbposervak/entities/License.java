@@ -27,7 +27,7 @@ public class License {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     @JsonBackReference
-    private User user; // TODO вот тут должен быть список если хотим чтобы активировать могли несколько человек
+    private User user;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")

@@ -39,4 +39,8 @@ public class SignatureAudit {
 
     @Column(name = "fields_changed", columnDefinition = "TEXT")
     private String fieldsChanged;
+
+    @Version
+    @Column(name = "version")
+    private Long version;
 }

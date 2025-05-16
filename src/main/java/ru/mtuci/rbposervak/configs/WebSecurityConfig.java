@@ -38,7 +38,8 @@ public class WebSecurityConfig {
 
                         .requestMatchers(
                                 "/signatures/**",
-                                "/api/signatures/**"
+                                "/api/signatures/**",
+                                "/api/sessions/**"
                         ).hasRole("ADMIN")
 
                         .anyRequest().authenticated()
