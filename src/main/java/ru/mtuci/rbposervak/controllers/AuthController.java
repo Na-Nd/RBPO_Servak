@@ -65,7 +65,7 @@ public class AuthController {
 
         try{
             UserSession session = userService.loginUser(userDTO);
-            return ResponseEntity.status(200).body(new TokenResponse(session.getAccessToken(), null));
+            return ResponseEntity.status(200).body(new TokenResponse(session.getAccessToken(), session.getRefreshToken()));
         } catch (Exception e){
             System.out.println("Ошибка при логине пользователя: " + e.getMessage());
             return ResponseEntity.status(400).body(

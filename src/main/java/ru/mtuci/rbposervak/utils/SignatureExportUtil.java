@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -23,6 +24,28 @@ public class SignatureExportUtil {
     }
 
     /// Создание манифеста
+//    public byte[] createManifest(List<Signature> signatures) throws Exception {
+//        try (ByteArrayOutputStream manifestStream = new ByteArrayOutputStream();
+//             DataOutputStream manifestData = new DataOutputStream(manifestStream)) {
+//
+//            // Количество сигнатур
+//            manifestData.writeInt(signatures.size());
+//
+//            // Массив digital_signature
+//            for (Signature signature : signatures) {
+//                manifestData.writeUTF(signature.getId().toString()); // id сигнатуры
+//                manifestData.writeUTF(signature.getDigitalSignature()); // её эцп
+//            }
+//
+//            // Подпись манифеста
+//            byte[] manifestContent = manifestStream.toByteArray();
+//            byte[] manifestSignature = signData(calculateHash(manifestContent));
+//            manifestData.write(manifestSignature);
+//            System.out.println(Arrays.toString(manifestSignature));
+//
+//            return manifestContent;
+//        }
+//    }
     public byte[] createManifest(List<Signature> signatures) throws Exception {
         try (ByteArrayOutputStream manifestStream = new ByteArrayOutputStream();
              DataOutputStream manifestData = new DataOutputStream(manifestStream)) {
@@ -32,16 +55,27 @@ public class SignatureExportUtil {
 
             // Массив digital_signature
             for (Signature signature : signatures) {
-                manifestData.writeUTF(signature.getId().toString()); // id сигнатуры
-                manifestData.writeUTF(signature.getDigitalSignature()); // её эцп
+                manifestData.writeUTF(signature.getId().toString());
+                manifestData.writeUTF(signature.getDigitalSignature());
             }
 
-            // Подпись манифеста
+            // Получаем данные БЕЗ подписи
             byte[] manifestContent = manifestStream.toByteArray();
-            byte[] manifestSignature = signData(calculateHash(manifestContent));
-            manifestData.write(manifestSignature);
 
-            return manifestContent;
+            // Подписываем
+            byte[] manifestSignature = signData(calculateHash(manifestContent));
+
+            // Создаём новый поток для полного манифеста
+            ByteArrayOutputStream fullManifest = new ByteArrayOutputStream();
+            DataOutputStream fullData = new DataOutputStream(fullManifest);
+
+            // Записываем оригинальные данные и подпись
+            fullData.write(manifestContent);
+            fullData.write(manifestSignature);
+
+            System.out.println("Signature: " + Arrays.toString(manifestSignature));
+
+            return fullManifest.toByteArray();
         }
     }
 

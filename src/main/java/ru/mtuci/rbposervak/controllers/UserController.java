@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.mtuci.rbposervak.entities.User;
 import ru.mtuci.rbposervak.entities.requests.UserRequest;
 import ru.mtuci.rbposervak.services.UserService;
+import ru.mtuci.rbposervak.services.UserSessionService;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final UserSessionService userSessionService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/info/{id}")
@@ -73,6 +75,16 @@ public class UserController {
             userService.deleteUser(id);
             return ResponseEntity.status(200).body("User with id: " + id + " deleted");
         } catch (Exception e){
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/update-refresh")
+    public ResponseEntity<?> updateRefresh(@RequestParam String refresh){
+        try{
+            return ResponseEntity.status(200).body(userSessionService.updateRefreshToken(refresh));
+        } catch (Exception e){
+            // Заглушка
             return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
         }
     }

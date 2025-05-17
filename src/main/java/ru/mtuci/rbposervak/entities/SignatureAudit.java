@@ -1,5 +1,6 @@
 package ru.mtuci.rbposervak.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,6 +29,7 @@ public class SignatureAudit {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "changed_by", referencedColumnName = "id")
+    @JsonIgnore
     private User changedBy;
 
     @Column(name = "changed_at")

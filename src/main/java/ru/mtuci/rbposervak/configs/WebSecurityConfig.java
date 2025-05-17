@@ -33,7 +33,9 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/auth/login",
                                 "/auth/register",
+                                "/user/**",
                                 "/auth/greeting")
+
                         .permitAll()
 
                         .requestMatchers(

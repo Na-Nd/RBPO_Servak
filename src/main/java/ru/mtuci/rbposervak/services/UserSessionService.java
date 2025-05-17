@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.mtuci.rbposervak.entities.DTO.TokenResponse;
 import ru.mtuci.rbposervak.entities.ENUMS.session.STATUS;
 import ru.mtuci.rbposervak.entities.User;
 import ru.mtuci.rbposervak.entities.UserSession;
@@ -285,5 +286,48 @@ public class UserSessionService {
         existingSession.setVersion(sessionRequest.getVersion());
 
         return userSessionRepository.save(existingSession);
+    }
+
+    /// Обновление рефреша
+    public TokenResponse updateRefreshToken(String refresh){
+        // Находим сессию с таким рефрешем
+        System.out.println("Пришел рефреш: " + refresh);
+        UserSession session = userSessionRepository.findByRefreshToken(refresh)
+                .orElseThrow(() -> new RuntimeException("Session not found"));
+
+        if (session.getStatus() != STATUS.ACTIVE) {
+            throw new RuntimeException("Session is not active");
+        }
+
+        // Проверка на наличие заблокированных сессий
+        if (hasBlockedSessions(session.getUser())) {
+            throw new RuntimeException("Unable to refresh access token: there are blocked sessions");
+        }
+
+        // Проверка на активные сессии
+        List<UserSession> activeSessions = userSessionRepository.findByUserAndStatus(session.getUser(), STATUS.ACTIVE);
+        if (activeSessions.size() > 1) { // Если больше одной - это подозрительная активность, соответственно блокируем
+            blockUserSessions(session.getUser());
+            throw new RuntimeException("Multiple active sessions detected. All sessions blocked.");
+        }
+
+        // Проверка истечения refresh токена
+        if (session.getRefreshTokenExpires().isBefore(LocalDateTime.now())) {
+            // Обновляем refresh токен
+            session.setRefreshToken(jwtUtil.generateRefreshToken(session.getUser()));
+            session.setRefreshTokenExpires(LocalDateTime.now().plus(Duration.ofMillis(refreshTokenExpiration)));
+
+            // и обновляем access
+            session.setAccessToken(jwtUtil.generateAccessToken(session.getUser()));
+            session.setAccessTokenExpires(LocalDateTime.now().plus(Duration.ofMillis(accessTokenExpiration)));
+            session.setLastActivityTime(LocalDateTime.now());
+        }
+
+        // Меняем статус текущей сессии на inactive
+        session.setStatus(STATUS.INACTIVE);
+
+        userSessionRepository.save(session);
+
+        return new TokenResponse(session.getAccessToken(), session.getRefreshToken(), null);
     }
 }

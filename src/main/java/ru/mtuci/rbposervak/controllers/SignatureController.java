@@ -84,6 +84,7 @@ public class SignatureController {
         }
     }
 
+    // TODO
     /// Удаление (смена статуса) сигнатуры
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSignature(@PathVariable UUID id, @RequestHeader("Authorization") String authBearer) {
@@ -107,6 +108,7 @@ public class SignatureController {
 
     }
 
+    // TODO
     /// Получение аудита по сигнатуре
     @GetMapping("/{id}/audit")
     public ResponseEntity<List<SignatureAudit>> getAudit(@PathVariable UUID id) {

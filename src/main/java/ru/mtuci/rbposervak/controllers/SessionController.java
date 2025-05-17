@@ -24,4 +24,5 @@ public class SessionController {
             return ResponseEntity.status(409).body(e.getMessage());
         }
     }
+
 }

@@ -44,7 +44,7 @@ public class SignatureService {
     }
 
     /// Обновление сигнатуры
-    public Signature updateSignature(UUID id, Signature updatedSignature, String authBearer) {
+    public Signature  updateSignature(UUID id, Signature updatedSignature, String authBearer) {
 
         authBearer = authBearer.substring(7);
         authBearer = jwtUtil.extractUsername(authBearer);
@@ -75,6 +75,7 @@ public class SignatureService {
 
     /// Сохранение старой сигнатуры
     private void saveToHistory(Signature signature) {
+        System.out.println("saveToHistory()");
         SignatureHistory history = SignatureHistory.builder()
                 .signature(signature)
                 .threatName(signature.getThreatName())
@@ -93,7 +94,7 @@ public class SignatureService {
 
     /// Формирование записи в аудите сигнатур
     private void logAudit(Signature signature, Long changedBy, ChangeType changeType, String fieldsChanged) {
-
+        System.out.println("logAudit()");
         SignatureAudit audit = SignatureAudit.builder()
                 .signature(signature)
                 .changedBy(userService.getUserById(changedBy))
@@ -127,13 +128,21 @@ public class SignatureService {
         return signatures;
     }
 
+    //TODO
     /// Удаление (смена статуса) сигнатуры
     public void deleteSignature(UUID id, String deletedBy) {
+        System.out.println("deleteSign()");
         Signature signature = signatureRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Signature not found"));
+        System.out.println("нашел сигу");
 
+        System.out.println(deletedBy);
         deletedBy = deletedBy.substring(7);
-        Long adminId = userService.findUserByLogin(deletedBy).getId();
+        String username = jwtUtil.extractUsername(deletedBy);
+        System.out.printf("Получен username: %s\n", username);
+
+        Long adminId = userService.findUserByLogin(username).getId();
+        System.out.printf("Получен adminId: %s\n", adminId);
 
         // Сохраняем в историю перед изменением
         saveToHistory(signature);
@@ -141,6 +150,7 @@ public class SignatureService {
         signature.setStatus(STATUS.DELETED);
         signature.setUpdatedAt(LocalDateTime.now());
         signatureRepository.save(signature);
+        System.out.println("Сохранил уделанную сигнатуру");
 
         logAudit(signature, adminId, ChangeType.DELETED, "Signature marked as deleted");
     }
